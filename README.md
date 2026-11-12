@@ -18,9 +18,8 @@ Repozitorij je spreman za **Workers** projekat povezan s GitHubom (deploy komand
    - Build command: *(prazno)*
    - Deploy command: **`npx wrangler deploy`**
    - Ime Workera: **`prodajni-panel`** (mora odgovarati polju `name` u `wrangler.jsonc`)
-2. **KV prostor** se kreira automatski pri prvom deployu (vezan kao `SARAJKA`).
-   Ako deploy javi da nedostaje KV `id`: *Storage & Databases → KV → Create namespace*, kopirajte njegov ID
-   i upišite ga u `wrangler.jsonc` kao `{ "binding": "SARAJKA", "id": "…" }`.
+2. **KV prostor** `prodajni-panel-sarajka` je vezan kao `SARAJKA` preko ID-a u `wrangler.jsonc`.
+   Ne brišite ga – u njemu su korisnici i linkovi za klijente.
 3. **Varijable** – Worker → *Settings* → *Variables and Secrets*:
    - `PUBLIC_URL` = javna adresa, npr. **`https://brosure.sarajka.ba/`** (postavite prije štampanja QR kodova).
    - `SESSION_SECRET` *(Secret, preporučeno)* = dug nasumičan tekst.
