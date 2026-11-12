@@ -510,7 +510,7 @@ const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','
 const fold = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d').replace(/[−–]/g,'-');
 const isTop = (() => { try { return window.self === window.top; } catch(e) { return false; } })();
 const BASE = CFG.publicUrl || ((!isTop && SHARE_URL) ? SHARE_URL : location.href.split('#')[0]);
-const linkFor = (b, i) => BASE + '#k-' + b.id + (i != null ? '-' + (i+1) : '');
+const linkFor = (b, i) => BASE + (SERVER ? '?k=' : '#k-') + b.id + (i != null ? '-' + (i+1) : '');
 
 const ICON = {
   zoom:'<svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6"/></svg>',
@@ -1076,7 +1076,8 @@ function route(){
     if (pk) return openPack(pk);
     if (CLIENT_ONLY) return clientMessage('Ponuda nije pronađena', 'Link koji ste otvorili nije ispravan. Kontaktirajte naš prodajni tim putem dugmeta Kontakt.');
   }
-  const k = h.match(/^k-([a-z-]+?)(?:-(\d+))?$/);
+  let kq = null; try { kq = new URLSearchParams(location.search).get('k'); } catch(e) {}
+  const k = (kq ? 'k-' + kq : h).match(/^k-([a-z-]+?)(?:-(\d+))?$/);
   if (k){
     const b = BROS.find(x => x.id === k[1]);
     if (b){
@@ -1089,6 +1090,7 @@ function route(){
       return;
     }
   }
+  if (CLIENT_ONLY && CFG.loginUrl){ location.replace(CFG.loginUrl); return; }
   if (CLIENT_ONLY) return clientMessage('Sarajka brošure', 'Za pregled ponude otvorite link ili skenirajte QR kod koji ste dobili od našeg prodajnog tima.');
   if (BROS.some(b => b.id === h)) selectBro(h, true); else showHome(true);
 }

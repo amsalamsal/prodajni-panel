@@ -21,7 +21,7 @@ function page(setup, err, vals = {}, info = '') {
 }
 
 export async function onRequestGet({ request, env }) {
-  if (await currentUser(request, env)) return redirect('/panel');
+  if (await currentUser(request, env)) return redirect('/');
   const setup = !Object.keys(await getUsers(env)).length;
   const info = new URL(request.url).searchParams.has('odjava') ? 'Odjavljeni ste.' : '';
   return html(page(setup, '', {}, info));
@@ -52,7 +52,7 @@ export async function onRequestPost({ request, env }) {
   const u = users[user];
   if (u && await verifyPassword(pass, u.hash)) {
     await noteAttempt(request, env, true);
-    return redirect('/panel', { 'Set-Cookie': await sessionCookie(env, user, u.ver || 0) });
+    return redirect('/', { 'Set-Cookie': await sessionCookie(env, user, u.ver || 0) });
   }
   await noteAttempt(request, env, false);
   return html(page(false, 'Pogrešno korisničko ime ili šifra.', { user }), 401);

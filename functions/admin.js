@@ -5,7 +5,7 @@ import { BROCHURES, getPacks, savePacks, getUsers, saveUsers, hashPassword, curr
 async function requireAdmin(request, env) {
   const u = await currentUser(request, env);
   if (!u) return { res: redirect('/prijava') };
-  if (u.role !== 'admin') return { res: html(layout('Zabranjeno', '<main><div class="msg err">Pristup dozvoljen samo administratoru. <a href="/panel">Nazad na panel</a></div></main>'), 403) };
+  if (u.role !== 'admin') return { res: html(layout('Zabranjeno', '<main><div class="msg err">Pristup dozvoljen samo administratoru. <a href="/">Nazad na panel</a></div></main>'), 403) };
   return { me: u };
 }
 const back = (type, msg, anchor = '', headers = {}) =>
@@ -126,7 +126,7 @@ export async function onRequestGet({ request, env }) {
   return html(layout('Administracija – Sarajka prodajni panel', `
 <div class="bar">
   <img src="/img/logo-light.svg" alt="Sarajka" width="84" height="50"><b>Administracija</b>
-  <nav><a href="/panel">← Prodajni panel</a><a href="#korisnici">Korisnici</a><a href="/odjava">Odjava</a></nav>
+  <nav><a href="/">← Prodajni panel</a><a href="#korisnici">Korisnici</a><a href="/odjava">Odjava</a></nav>
 </div>
 <main>
   <div>

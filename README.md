@@ -5,8 +5,9 @@ Radi na **Cloudflare Pages** (statične stranice + Pages Functions) s podacima u
 
 | Adresa | Ko vidi | Šta je |
 |---|---|---|
+| `/` | prijavljeni agenti | **cijeli prodajni panel** (bez prijave vodi na `/prijava`) |
 | `/?p=stanovi`, `/?p=garaze`, `/?p=poslovni` … | svi (klijenti) | brošure iz jednog paketa – trajni link / QR kod |
-| `/panel` | prijavljeni agenti | prodajni panel |
+| `/?k=lamela-a-12` | svi (klijenti) | jedna brošura ili stranica (link iz panela) |
 | `/admin` | administratori | linkovi za klijente, QR kodovi, korisnici |
 | `/prijava`, `/odjava` | – | prijava / odjava |
 
