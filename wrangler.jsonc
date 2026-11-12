@@ -1,0 +1,23 @@
+// Postavke za Cloudflare Workers (deploy komanda: npx wrangler deploy).
+// Ime mora odgovarati imenu Workera u Cloudflare dashboardu.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "prodajni-panel",
+  "main": "worker.js",
+  "compatibility_date": "2025-09-01",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    // Ove putanje prvo obrađuje Worker (prijava, panel, administracija, stranica za klijente);
+    // slike i ostale statične datoteke se služe direktno.
+    "run_worker_first": ["/", "/panel", "/panel/", "/prijava", "/prijava/", "/odjava", "/odjava/", "/admin", "/admin/", "/app-shell*"]
+  },
+  // KV prostor za linkove za klijente i korisnike. Bez "id" Wrangler ga sam kreira pri prvom deployu.
+  // Ako deploy javi da nedostaje id: kreirajte KV prostor u dashboardu i upišite ovdje "id": "…".
+  "kv_namespaces": [
+    { "binding": "SARAJKA" }
+  ],
+  // Varijable (PUBLIC_URL, SESSION_SECRET) postavljaju se u dashboardu i ne brišu se pri deployu.
+  "keep_vars": true,
+  "observability": { "enabled": true }
+}

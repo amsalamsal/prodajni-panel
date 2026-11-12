@@ -2,8 +2,9 @@
   "name": "sarajka-brosure",
   "private": true,
   "type": "module",
-  "description": "Sarajka prodajni panel i stranice za klijente – Cloudflare Pages + Pages Functions + KV",
+  "description": "Sarajka prodajni panel i stranice za klijente – Cloudflare Workers (ili Pages) + KV",
   "scripts": {
-    "dev": "wrangler pages dev public --kv SARAJKA"
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
   }
 }

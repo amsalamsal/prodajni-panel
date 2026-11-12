@@ -10,7 +10,26 @@ Radi na **Cloudflare Pages** (statične stranice + Pages Functions) s podacima u
 | `/admin` | administratori | linkovi za klijente, QR kodovi, korisnici |
 | `/prijava`, `/odjava` | – | prijava / odjava |
 
-## Postavljanje na Cloudflare (jednom)
+## Postavljanje na Cloudflare – Workers (preporučeno)
+
+Repozitorij je spreman za **Workers** projekat povezan s GitHubom (deploy komanda `npx wrangler deploy`).
+
+1. *Workers & Pages* → *Create* → *Import a repository* → `prodajni-panel`.
+   - Build command: *(prazno)*
+   - Deploy command: **`npx wrangler deploy`**
+   - Ime Workera: **`prodajni-panel`** (mora odgovarati polju `name` u `wrangler.jsonc`)
+2. **KV prostor** se kreira automatski pri prvom deployu (vezan kao `SARAJKA`).
+   Ako deploy javi da nedostaje KV `id`: *Storage & Databases → KV → Create namespace*, kopirajte njegov ID
+   i upišite ga u `wrangler.jsonc` kao `{ "binding": "SARAJKA", "id": "…" }`.
+3. **Varijable** – Worker → *Settings* → *Variables and Secrets*:
+   - `PUBLIC_URL` = javna adresa, npr. **`https://brosure.sarajka.ba/`** (postavite prije štampanja QR kodova).
+   - `SESSION_SECRET` *(Secret, preporučeno)* = dug nasumičan tekst.
+   Varijable se ne brišu pri novom deployu (`keep_vars`).
+4. **Domena** – Worker → *Settings* → *Domains & Routes* → *Add* → *Custom domain* → `brosure.sarajka.ba`
+   (DNS za sarajka.ba mora biti na Cloudflareu).
+5. Otvorite **`https://brosure.sarajka.ba/prijava`** i kreirajte administratorski račun.
+
+## Postavljanje na Cloudflare – Pages (alternativa)
 
 1. **Pages projekat** – Cloudflare dashboard → *Workers & Pages* → *Create* → *Pages* → *Connect to Git* → odaberite ovaj repozitorij.
    - Framework preset: **None**
@@ -56,15 +75,17 @@ Svaki commit na granu `main` automatski objavljuje novu verziju. Korisnici i lin
 
 ```
 public/              statične datoteke (Cloudflare Pages output)
-  app-shell.html     aplikacija (panel + stranice za klijente); nije dostupna direktno
+  app-shell.txt      aplikacija (panel + stranice za klijente); nije dostupna direktno
   img/ zoom/ sprite/ stranice brošura (standardne, za zum, sličice)
   assets/            administracija (CSS/JS), QR biblioteka
   _routes.json       samo ove putanje pokreću Functions; slike se služe direktno
-functions/           Pages Functions: index (klijenti), panel, prijava, odjava, admin, _middleware
+functions/           obrada zahtjeva: index (klijenti), panel, prijava, odjava, admin, _middleware
+worker.js            ulaz za Cloudflare Workers (koristi functions/)
+wrangler.jsonc       postavke za Workers (assets, KV)
 lib/sarajka.js       zajednička logika: KV, šifre, sesije, prikaz
 ```
 
-Brošure su navedene u `lib/sarajka.js` (`BROCHURES`) i u `public/app-shell.html` (`BROS`, `LABELS`).
+Brošure su navedene u `lib/sarajka.js` (`BROCHURES`) i u `public/app-shell.txt` (`BROS`, `LABELS`).
 Nova brošura traži slike u `img/`, `zoom/` i `sprite/` te upis na oba mjesta.
 
-Lokalni test (opcionalno): `npx wrangler pages dev public --kv SARAJKA`.
+Lokalni test (opcionalno): `npx wrangler dev`.
