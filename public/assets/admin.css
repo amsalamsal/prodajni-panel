@@ -1,0 +1,75 @@
+/* Sarajka – prijava i administracija */
+  :root{--green:#134A3A;--green-d:#0D3529;--gold-a:#8C5A1E;--gold-b:#E9D39A;--paper:#F4F2EE;--card:#fff;--ink:#16231E;--muted:#6B6259;
+    --line:rgba(19,74,58,.14);--hover:rgba(19,74,58,.06);--red:#951A1F;
+    --serif:"Playfair Display",Georgia,serif;--sans:"Montserrat","Segoe UI",Arial,sans-serif;color-scheme:light}
+  *{box-sizing:border-box;margin:0}
+  [hidden]{display:none!important}
+  body{font:14px/1.5 var(--sans);color:var(--ink);background:var(--paper);min-height:100vh}
+  a{color:var(--green)}
+  input,select,textarea,button{font:inherit}
+  input[type=text],input[type=password],select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink)}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--gold-b);border-color:var(--gold-a)}
+  textarea{min-height:80px;resize:vertical}
+  label{display:grid;gap:6px;font-size:12.5px;font-weight:600;color:var(--green)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:13px;color:var(--green);background:#fff;border:1px solid var(--line);
+    border-radius:9px;padding:10px 14px;cursor:pointer;text-decoration:none;white-space:nowrap}
+  .btn:hover{border-color:rgba(19,74,58,.35)}
+  .btn.pri{background:var(--green);border-color:var(--green);color:#fff}
+  .btn.pri:hover{background:var(--green-d)}
+  .btn.danger{color:var(--red)}
+  .msg{padding:12px 14px;border-radius:10px;font-size:13.5px;background:#E7F1EC;color:var(--green);border:1px solid rgba(19,74,58,.2)}
+  .msg.err{background:#F8E9E9;color:var(--red);border-color:rgba(149,26,31,.25)}
+  .hint{font-size:12px;font-weight:500;color:var(--muted)}
+
+/* prijava */
+  body.login{display:grid;place-items:center;padding:24px 16px;background:var(--green-d)}
+  .box{width:min(400px,100%);background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 30px 60px -20px rgba(0,0,0,.5)}
+  .box header{background:var(--green);padding:28px 24px 22px;display:grid;justify-items:center;gap:10px}
+  .box header img{width:140px;height:auto}
+  .box header span{font-size:10.5px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-b)}
+  .box form{display:grid;gap:14px;padding:24px}
+  .box h1{font-family:var(--serif);font-weight:400;font-size:24px;color:var(--green)}
+  .box p{font-size:13px;color:var(--muted)}
+  .box .btn{width:100%;padding:12px}
+
+/* administracija */
+  .bar{position:sticky;top:0;z-index:5;background:var(--green-d);color:#fff;display:flex;align-items:center;gap:18px;padding:12px max(20px,env(safe-area-inset-right)) 12px max(20px,env(safe-area-inset-left))}
+  .bar img{width:84px;height:auto}
+  .bar b{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-b)}
+  .bar nav{margin-left:auto;display:flex;gap:16px;flex-wrap:wrap}
+  .bar nav a{color:#fff;text-decoration:none;font-weight:600;font-size:13px}
+  .bar nav a:hover{color:var(--gold-b)}
+  main{max-width:1080px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right)) 80px max(16px,env(safe-area-inset-left));display:grid;gap:30px}
+  h1{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--green)}
+  h2{display:flex;align-items:center;gap:14px;font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--green)}
+  h2::after{content:"";flex:1;height:1px;background:var(--line)}
+  .intro{color:var(--muted);max-width:70ch;margin-top:6px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;display:grid;gap:16px;scroll-margin-top:80px}
+  .card.off{background:#FAF7F5}
+  .pack{display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:24px}
+  .pack .f{display:grid;gap:14px;min-width:0}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .linkrow{display:flex;gap:8px}
+  .linkrow input{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;background:var(--paper)}
+  .bro{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px}
+  .bro label{display:flex;align-items:center;gap:10px;font-weight:500;color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:8px 10px;cursor:pointer}
+  .bro label:has(input[type=checkbox]:checked){border-color:var(--green);background:var(--hover)}
+  .bro input[type=checkbox]{width:16px;height:16px;accent-color:var(--green)}
+  .bro input[type=number]{width:52px;margin-left:auto;padding:5px 6px;border:1px solid var(--line);border-radius:7px;font-size:12px}
+  .bro span{flex:1}
+  .tag{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:3px 9px;background:var(--hover);color:var(--green)}
+  .tag.off{background:rgba(149,26,31,.08);color:var(--red)}
+  .qr{display:grid;gap:8px;justify-items:center;align-content:start}
+  .qr .code{width:170px;height:170px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:4px;display:grid;place-items:center}
+  .qr .code canvas{width:160px;height:160px;image-rendering:pixelated}
+  .qr .btn{width:100%}
+  .head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .head h3{font-family:var(--serif);font-weight:500;font-size:22px;color:var(--green)}
+  table{width:100%;border-collapse:collapse}
+  th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle;font-size:13.5px}
+  th{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  td form{display:flex;gap:6px;align-items:center}
+  td input[type=password]{max-width:180px;padding:7px 10px}
+  .tbl{overflow-x:auto}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;align-items:end}
+  @media (max-width:720px){ .pack{grid-template-columns:1fr} .qr{justify-items:start} .qr .btn{width:auto} .bar img{width:64px} }

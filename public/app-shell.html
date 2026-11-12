@@ -1,0 +1,1101 @@
+<!doctype html>
+<html lang="bs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sarajka prodajni panel</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;500&display=swap">
+<style>
+  /* Layout: radni panel za prodajne agente – tamnozelena bočna traka (pretraga + brošure), desno mreža stranica s oznakama;
+     "Prezentuj klijentu" otvara 3D listanje preko cijelog ekrana, a zum radi na svakoj stranici. */
+  :root{
+    --green:#134A3A; --green-d:#0D3529; --green-dd:#092a20; --gold-a:#8C5A1E; --gold-b:#E9D39A; --taupe:#A68A73;
+    --paper:#F4F2EE; --card:#FFFFFF; --ink:#16231E; --muted:#6B6259; --line:rgba(19,74,58,.13); --hover:rgba(19,74,58,.06);
+    --acc:#134A3A;
+    --serif:"Playfair Display","Didot","Bodoni 72",Georgia,serif;
+    --sans:"Montserrat","Segoe UI","Helvetica Neue",Arial,sans-serif;
+    --side:288px;
+    --pw:400px; --ph:283px;
+    color-scheme:light;
+  }
+  *{box-sizing:border-box;margin:0}
+  [hidden]{display:none!important}
+  html,body{height:100%}
+  body{font-family:var(--sans);color:var(--ink);background:var(--paper);font-size:14px}
+  body.presenting{overflow:hidden}
+  button{font-family:inherit}
+  a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--gold-a);outline-offset:2px}
+
+  /* ---------- side bar ---------- */
+  .side{position:fixed;top:0;bottom:0;left:0;width:var(--side);background:var(--green-d);color:#E9EFEC;display:flex;flex-direction:column;
+    padding:calc(20px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));z-index:3}
+  .brand{display:flex;flex-direction:column;align-items:center;gap:9px;padding:4px 0 20px}
+  .brand img{display:block;width:118px;height:auto}
+  .brand span{display:block;width:118px;font-size:9.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-b);white-space:nowrap}
+  .search{position:relative}
+  .search input{width:100%;font:500 14px var(--sans);color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+    border-radius:10px;padding:11px 36px 11px 36px}
+  .search input::-webkit-search-cancel-button{display:none;-webkit-appearance:none}
+  .search input::placeholder{color:rgba(233,239,236,.55)}
+  .search input:focus{outline:none;border-color:var(--gold-b);background:rgba(255,255,255,.12)}
+  .search svg{position:absolute;left:11px;top:50%;width:16px;height:16px;transform:translateY(-50%);stroke:rgba(233,239,236,.6);fill:none;stroke-width:2}
+  .search kbd{position:absolute;right:10px;top:50%;transform:translateY(-50%);font:600 11px var(--sans);color:rgba(233,239,236,.55);
+    border:1px solid rgba(255,255,255,.18);border-radius:5px;padding:2px 6px}
+  .search .clr{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;color:#fff;font-size:18px;padding:4px 8px;cursor:pointer}
+  .navlbl{font-size:10.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(233,239,236,.5);padding:22px 8px 8px}
+  .nav{display:grid;gap:2px;overflow-y:auto;min-height:0}
+  .nav button{all:unset;cursor:pointer;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:4px 10px;padding:9px 10px;border-radius:9px}
+  .nav button:hover{background:rgba(255,255,255,.06)}
+  .nav button:focus-visible{outline:2px solid var(--gold-b);outline-offset:-2px}
+  .nav button[aria-current="true"]{background:rgba(255,255,255,.12)}
+  .nav i{width:9px;height:9px;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px rgba(255,255,255,.18)}
+  .nav b{font-weight:600;font-size:13.5px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nav small{font-size:11.5px;color:rgba(233,239,236,.6);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .nav em{grid-column:2/4;font-style:normal;font-size:11.5px;color:rgba(233,239,236,.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .keys{margin-top:auto;padding:14px 8px 0;border-top:1px solid rgba(255,255,255,.1);font-size:11.5px;line-height:1.9;color:rgba(233,239,236,.6)}
+  .keys kbd{font:600 10.5px var(--sans);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:4px;padding:1px 5px;margin-right:4px}
+  .keys a{color:var(--gold-b);text-decoration:none}
+  .side .user{margin-top:auto;display:grid;gap:3px;padding:14px 8px 12px;border-top:1px solid rgba(255,255,255,.1);font-size:12px;color:rgba(233,239,236,.75)}
+  .side .user b{color:#fff}
+  .side .user a{color:var(--gold-b);text-decoration:none;font-weight:600}
+  .side .user + .keys{margin-top:0}
+  .pk h4 small.off{font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:#951A1F;background:rgba(149,26,31,.08);border-radius:999px;padding:3px 8px;vertical-align:middle}
+
+  /* ---------- main ---------- */
+  .main{margin-left:var(--side);min-height:100%;padding-top:calc(26px + env(safe-area-inset-top,0px));padding-bottom:48px;
+    padding-left:32px;padding-right:max(32px,env(safe-area-inset-right,0px))}
+  .head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:18px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+  .head .t{display:flex;align-items:center;gap:18px;min-width:0}
+  .head img{width:120px;aspect-ratio:1.4142;object-fit:cover;box-shadow:0 10px 22px -12px rgba(30,25,15,.5);background:#fff;flex:none}
+  .head h1{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.1;color:var(--green);text-wrap:balance}
+  .head p{font-size:13px;color:var(--muted);margin-top:6px}
+  .stats{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .stats span{font-size:11.5px;font-weight:600;color:var(--green);background:var(--hover);border-radius:999px;padding:5px 10px;font-variant-numeric:tabular-nums}
+  .acts{display:flex;flex-wrap:wrap;gap:8px}
+  .btn{display:inline-flex;align-items:center;gap:8px;font:600 13px var(--sans);color:var(--green);background:var(--card);border:1px solid var(--line);
+    border-radius:10px;padding:10px 14px;cursor:pointer;text-decoration:none;white-space:nowrap}
+  .btn:hover{border-color:rgba(19,74,58,.35)}
+  .btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .btn.pri{background:var(--green);border-color:var(--green);color:#fff}
+  .btn.pri:hover{background:var(--green-d)}
+  .btn.gold{background:linear-gradient(90deg,var(--gold-a),#C9A25E);border-color:transparent;color:#fff}
+
+  .tools{display:grid;gap:12px;padding:16px 0 18px}
+  .segs{display:flex;flex-wrap:wrap;gap:6px}
+  .segs button{font:600 12.5px var(--sans);color:var(--green);background:transparent;border:1px solid var(--line);border-radius:999px;padding:7px 12px;cursor:pointer;
+    display:flex;gap:6px;align-items:center}
+  .segs button small{font-weight:500;color:var(--muted);font-variant-numeric:tabular-nums}
+  .segs button[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:#fff}
+  .segs button[aria-pressed="true"] small{color:rgba(255,255,255,.7)}
+  .floors{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .floors > span{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+  .floors button{font:600 12.5px var(--sans);min-width:34px;height:32px;padding:0 9px;border-radius:8px;border:1px solid var(--line);background:var(--card);
+    color:var(--ink);cursor:pointer;font-variant-numeric:tabular-nums}
+  .floors button:hover{border-color:var(--acc);color:var(--green)}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px}
+  .pg{position:relative;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+  .pg .im{position:relative;aspect-ratio:1.4142;background:#ECE9E3;cursor:zoom-in;border:0;padding:0;display:block;width:100%}
+  .pg .im .th{position:absolute;inset:0;background-repeat:no-repeat}
+  .pg .no{position:absolute;left:8px;top:8px;font:700 11px var(--sans);font-variant-numeric:tabular-nums;color:#fff;background:rgba(13,53,41,.82);
+    border-radius:6px;padding:3px 7px}
+  .pg .tag{position:absolute;right:8px;top:8px;font:600 10.5px var(--sans);letter-spacing:.04em;color:var(--ink);background:rgba(255,255,255,.92);border-radius:6px;padding:3px 7px}
+  .pg .tag.plan{background:var(--gold-b);color:#3b2a0e}
+  .pg .ft{display:flex;align-items:center;gap:8px;padding:9px 8px 9px 12px;border-top:1px solid var(--line)}
+  .pg .lb{flex:1;min-width:0}
+  .pg .lb b{display:block;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pg .lb small{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pg .lb small i{width:7px;height:7px;border-radius:50%;background:var(--c);flex:none}
+  .pg .ic{width:32px;height:32px;display:grid;place-items:center;border-radius:8px;border:0;background:transparent;color:var(--green);cursor:pointer;flex:none}
+  .pg .ic:hover{background:var(--hover)}
+  .pg .ic svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .pg.flash{animation:flash 1.4s ease}
+  @keyframes flash{0%,40%{box-shadow:0 0 0 3px var(--gold-a)}100%{box-shadow:0 0 0 0 transparent}}
+  .rhead{display:flex;align-items:baseline;gap:12px;padding:6px 0 14px}
+  .rhead h2{font-family:var(--serif);font-weight:400;font-size:26px;color:var(--green)}
+  .rhead span{color:var(--muted);font-size:13px}
+  /* pregled svih brošura (naslovnice) */
+  .home{display:grid;gap:30px}
+  .hgrp{display:grid;gap:14px}
+  .hgrp h3{display:flex;align-items:center;gap:14px;font:600 11px var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--green)}
+  .hgrp h3::after{content:"";flex:1;height:1px;background:var(--line)}
+  .bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:22px}
+  .bc{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;min-width:0;
+    transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s}
+  .bc:hover{transform:translateY(-3px);box-shadow:0 18px 30px -18px rgba(30,25,15,.45)}
+  .bc .cv{border:0;padding:0;cursor:pointer;display:block;width:100%;aspect-ratio:1.4142;background:#ECE9E3}
+  .bc .cv img{display:block;width:100%;height:100%;object-fit:cover}
+  .bc .bd{display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 9px;align-items:baseline;padding:12px 14px 4px}
+  .bc .bd i{width:9px;height:9px;border-radius:50%;background:var(--c)}
+  .bc .bd b{font-family:var(--serif);font-weight:500;font-size:20px;color:var(--green);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bc .bd span{grid-column:2;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bc .bd .n{font-size:11.5px;font-weight:600;color:var(--green);font-variant-numeric:tabular-nums}
+  .bc .ba{display:flex;align-items:center;gap:4px;padding:8px 8px 10px 14px;margin-top:auto}
+  .bc .ba .open{flex:1;text-align:left;font:600 12.5px var(--sans);color:var(--green);background:none;border:0;cursor:pointer;padding:8px 0;display:flex;align-items:center;gap:8px}
+  .bc .ba .open::after{content:"";width:18px;height:1px;background:var(--gold-a);transition:width .3s}
+  .bc:hover .ba .open::after{width:32px}
+  .bc .ic{width:34px;height:34px;display:grid;place-items:center;border-radius:8px;border:0;background:transparent;color:var(--green);cursor:pointer}
+  .bc .ic:hover{background:var(--hover)}
+  .bc .ic svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .nav button.all i{background:none;box-shadow:none;width:auto;height:auto;color:var(--gold-b);font-style:normal}
+  .nav button.all svg{width:12px;height:12px;display:block}
+  /* paketi za klijente (agent) */
+  .packs{display:grid;gap:10px}
+  .pk{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 16px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 14px 14px 18px}
+  .pk h4{font-family:var(--serif);font-weight:500;font-size:19px;color:var(--green)}
+  .pk .inc{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .pk .inc span{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--ink);background:var(--hover);border-radius:999px;padding:4px 10px}
+  .pk .inc i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+  .pk .acts{justify-content:flex-end}
+  .pk .btn{padding:8px 12px;font-size:12.5px}
+  /* klijentski pregled paketa */
+  body.cview .side,body.cview .main{display:none}
+  .cshelf{min-height:100%;padding-top:calc(28px + env(safe-area-inset-top,0px));padding-bottom:56px;
+    padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px));
+    background:radial-gradient(ellipse at 50% 30%,#F6F4F0 0%,#E4E0D9 80%) fixed;background-color:#E9E5DE}
+  .cshelf .wrap{max-width:1180px;margin:0 auto;display:grid;gap:34px}
+  .cshelf .ctop{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .cshelf .ctop img{display:block;width:150px;height:auto}
+  .cshelf .ctop a{color:var(--green);font-size:13px;text-decoration:none;border-bottom:1px solid var(--taupe)}
+  .cshelf .eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--taupe);font-weight:600}
+  .cshelf h1{font-family:var(--serif);font-weight:400;font-size:clamp(30px,4.5vw,50px);line-height:1.08;color:var(--green);text-wrap:balance;margin-top:10px}
+  .cshelf p.lead{font-size:15px;line-height:1.65;color:var(--muted);max-width:58ch;margin-top:12px}
+  .cshelf .bc .ic{display:none}
+  .cshelf .bgrid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:18px}
+  @media (max-width:640px){ .cshelf .bgrid{grid-template-columns:1fr} .cshelf .eyebrow{letter-spacing:.12em} }
+  .empty{padding:48px 0;color:var(--muted);font-size:14px;line-height:1.7;max-width:52ch}
+  .empty b{color:var(--ink)}
+
+  .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);z-index:40;background:var(--green-dd);color:#fff;
+    font-size:13px;font-weight:500;padding:11px 16px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;
+    transition:opacity .3s,transform .3s;max-width:calc(100vw - 32px)}
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+  .copybox{position:fixed;inset:0;z-index:45;background:rgba(9,42,32,.45);display:grid;place-items:center;padding:16px}
+  .copybox div{background:var(--card);border-radius:14px;padding:20px;width:min(520px,100%);display:grid;gap:12px;box-shadow:0 30px 60px rgba(0,0,0,.3)}
+  .copybox b{font-size:14px}
+  .copybox input{font:500 13px var(--sans);padding:10px 12px;border:1px solid var(--line);border-radius:8px;width:100%;color:var(--ink)}
+  .copybox p{font-size:12.5px;color:var(--muted)}
+
+  /* ---------- presentation (flip-book) ---------- */
+  .present{position:fixed;inset:0;z-index:10;background:radial-gradient(ellipse at 50% 42%,#F6F4F0 0%,#E4E0D9 70%,#D6D0C6 100%);
+    opacity:0;visibility:hidden;transition:opacity .4s,visibility 0s .4s}
+  body.presenting .present{opacity:1;visibility:visible;transition:opacity .4s}
+  .ptop{position:absolute;top:0;left:0;right:0;z-index:6;display:flex;align-items:center;gap:14px;
+    padding:calc(14px + env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) 0 max(20px,env(safe-area-inset-left,0px))}
+  .ptop::before{content:"";position:absolute;left:0;right:0;top:0;height:calc(4px + env(safe-area-inset-top,0px));background:var(--acc)}
+  .ptop .pb{display:block;height:46px;width:auto}
+  .ptop .pn{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--green);min-width:0}
+  .ptop .pn i{width:9px;height:9px;border-radius:50%;background:var(--acc);flex:none}
+  .ptop .pn span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ptop .pn small{font-weight:500;color:var(--muted)}
+  .ptop .sp{flex:1}
+  .ptop a{color:var(--green);font-size:13px;text-decoration:none;border-bottom:1px solid var(--taupe);white-space:nowrap}
+  .ptop .x{font:600 13px var(--sans);color:#fff;background:var(--green);border:0;border-radius:999px;padding:10px 16px;cursor:pointer;white-space:nowrap}
+  body.client:not(.multi) .ptop .x{display:none}
+  body:not(.client) .ptop a{display:none}
+
+  .stage{position:absolute;inset:0;display:grid;place-items:center;perspective:2400px;touch-action:none;padding-bottom:70px;cursor:pointer}
+  .tilt{transform-style:preserve-3d;transform:rotateX(5deg);transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+  .book{position:relative;width:calc(var(--pw)*2);height:var(--ph);transform-style:preserve-3d;transition:transform .9s cubic-bezier(.3,.7,.2,1)}
+  .book.single{width:var(--pw)}
+  .floor{position:absolute;bottom:calc(var(--ph)*-0.07);height:calc(var(--ph)*0.14);width:calc(var(--pw)*0.94);
+    background:radial-gradient(closest-side,rgba(40,30,20,.38),transparent);filter:blur(6px);transform:translateZ(-4px);transition:opacity .5s;pointer-events:none}
+  .floor.l{left:3%} .floor.r{right:3%}
+  .book.single .floor.l{display:none} .book.single .floor.r{right:3%;width:94%}
+  .book.at-start .floor.l,.book.at-end .floor.r{opacity:0}
+  .leaf{position:absolute;top:0;left:var(--pw);width:var(--pw);height:100%;transform-origin:left center;transform-style:preserve-3d;
+    transition:transform 1s cubic-bezier(.45,.05,.2,1),opacity .35s ease .55s}
+  .book.single .leaf{left:0}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:#fff;overflow:hidden}
+  .face.back{transform:rotateY(180deg)}
+  .face img{display:block;width:100%;height:100%;max-width:none;object-fit:cover;user-select:none;-webkit-user-drag:none;pointer-events:none;opacity:0;transition:opacity .35s}
+  .face img.ok{opacity:1}
+  .face::after,.face::before{content:"";position:absolute;inset:0;pointer-events:none}
+  .book:not(.single) .face.front::after{background:linear-gradient(90deg,rgba(0,0,0,.22),rgba(0,0,0,.05) 3%,transparent 8%)}
+  .book:not(.single) .face.back::after{background:linear-gradient(270deg,rgba(0,0,0,.22),rgba(0,0,0,.05) 3%,transparent 8%)}
+  .face.front::before{background:linear-gradient(90deg,rgba(0,0,0,.35),rgba(255,255,255,.18) 60%,rgba(0,0,0,.1));opacity:0}
+  .face.back::before{background:linear-gradient(270deg,rgba(0,0,0,.35),rgba(255,255,255,.18) 60%,rgba(0,0,0,.1));opacity:0}
+  .leaf.moving .face::before{animation:shade 1s ease}
+  @keyframes shade{50%{opacity:1}}
+  .leaf.gone{opacity:0}
+
+  .ui{position:absolute;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:5;
+    display:flex;align-items:center;gap:10px;background:var(--green);color:#fff;padding:8px 10px;border-radius:999px;
+    box-shadow:0 10px 30px rgba(13,53,41,.3);white-space:nowrap}
+  .ui button{font:600 14px/1 var(--sans);color:#fff;background:transparent;border:0;border-radius:999px;padding:11px 14px;cursor:pointer}
+  .ui button:hover{background:rgba(255,255,255,.1)}
+  .ui button:disabled{opacity:.35;cursor:default;background:transparent}
+  .ui .zb{display:flex;align-items:center;gap:8px;background:linear-gradient(90deg,var(--gold-a),var(--gold-b));color:var(--green-d)}
+  .ui .zb:hover{background:linear-gradient(90deg,var(--gold-a),var(--gold-b));filter:brightness(1.06)}
+  .ui svg.ic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+  .count{font-size:13px;min-width:72px;text-align:center;font-variant-numeric:tabular-nums}
+  input[type=range]{width:140px;accent-color:var(--gold-b)}
+  .hint{position:absolute;left:0;right:0;bottom:calc(84px + env(safe-area-inset-bottom,0px));text-align:center;font-size:13px;color:var(--muted);transition:opacity .6s;pointer-events:none}
+  .hint.off{opacity:0}
+
+  /* ---------- zoom ---------- */
+  .zoom{position:fixed;inset:0;z-index:20;background:#E9E5DE;display:grid;grid-template-rows:1fr auto;animation:zin .3s ease}
+  @keyframes zin{from{opacity:0}}
+  .zview{position:relative;overflow:hidden;touch-action:none;cursor:grab;background:radial-gradient(ellipse at 50% 45%,#F6F4F0 0%,#E4E0D9 75%)}
+  .zview.drag{cursor:grabbing}
+  .zcan{position:absolute;left:0;top:0;transform-origin:0 0;display:flex;will-change:transform;box-shadow:0 30px 60px -30px rgba(40,30,20,.5)}
+  .zcan.anim{transition:transform .28s cubic-bezier(.2,.7,.2,1)}
+  .zcan img{display:block;width:1600px;min-width:1600px;max-width:none;height:1131px;flex:none;object-fit:cover;background:#fff;user-select:none;-webkit-user-drag:none;pointer-events:none}
+  .zcan img + img{box-shadow:inset 14px 0 18px -14px rgba(0,0,0,.25)}
+  .zbar{display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap;
+    padding:10px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));background:var(--green);color:#fff}
+  .zbar button{font:600 14px/1 var(--sans);color:#fff;background:transparent;border:0;border-radius:999px;padding:10px 13px;cursor:pointer;min-width:40px}
+  .zbar button:hover{background:rgba(255,255,255,.1)}
+  .zbar button:disabled{opacity:.35;cursor:default;background:transparent}
+  .zbar .pct{min-width:58px;text-align:center;font-size:13px;font-variant-numeric:tabular-nums}
+  .zbar .sep{width:1px;height:22px;background:rgba(255,255,255,.2);margin:0 4px}
+  .zbar .close{background:linear-gradient(90deg,var(--gold-a),var(--gold-b));color:var(--green-d)}
+  .ztip{position:absolute;left:50%;top:calc(16px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:rgba(13,53,41,.82);color:#fff;font-size:12.5px;
+    padding:8px 14px;border-radius:999px;white-space:nowrap;pointer-events:none;transition:opacity .6s}
+  .ztip.off{opacity:0}
+  .ztip .short{display:none}
+  .zname{position:absolute;left:max(16px,env(safe-area-inset-left,0px));top:calc(16px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:8px;
+    font-size:13px;font-weight:600;color:var(--green);pointer-events:none;background:rgba(255,255,255,.7);padding:7px 12px;border-radius:999px}
+  .zname i{width:9px;height:9px;border-radius:50%;background:var(--acc)}
+
+  /* ---------- kontakt (plutajuće dugme) ---------- */
+  .fab{position:fixed;z-index:15;right:max(20px,calc(env(safe-area-inset-right,0px) + 16px));bottom:calc(20px + env(safe-area-inset-bottom,0px));
+    display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+  body.presenting .fab{bottom:calc(20px + env(safe-area-inset-bottom,0px))}
+  .fabbtn{display:flex;align-items:center;gap:9px;height:52px;padding:0 20px 0 16px;border:0;border-radius:999px;cursor:pointer;
+    font:700 14px var(--sans);color:var(--green-d);background:linear-gradient(90deg,#C9A25E,var(--gold-b));
+    box-shadow:0 12px 28px -8px rgba(13,53,41,.45),0 0 0 1px rgba(255,255,255,.4) inset}
+  .fabbtn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .fabbtn:hover{filter:brightness(1.05)}
+  .fabmenu{width:min(300px,calc(100vw - 32px));background:var(--card);border-radius:16px;overflow:hidden;
+    box-shadow:0 24px 50px -12px rgba(9,42,32,.45),0 0 0 1px var(--line);animation:fabin .22s ease}
+  @keyframes fabin{from{opacity:0;transform:translateY(8px)}}
+  .fabmenu header{background:var(--green-d);color:#fff;padding:16px 18px;display:flex;align-items:center;gap:12px}
+  .fabmenu header img{width:64px;height:auto}
+  .fabmenu header div{display:grid;gap:2px}
+  .fabmenu header b{font-size:14px}
+  .fabmenu header small{font-size:11.5px;color:rgba(255,255,255,.65)}
+  .fi{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:12px 10px 12px 16px;border-top:1px solid var(--line)}
+  .fi:first-of-type{border-top:0}
+  .fi .ico{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--hover);color:var(--green)}
+  .fi .ico svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .fi a{color:inherit;text-decoration:none;min-width:0;display:grid;gap:1px}
+  .fi a b{font-size:13.5px;color:var(--green)}
+  .fi a span{font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums;user-select:all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fi a:hover b{text-decoration:underline}
+  .fi .cpy{border:0;background:transparent;color:var(--muted);font:600 11.5px var(--sans);padding:8px;border-radius:8px;cursor:pointer}
+  .fi .cpy:hover{background:var(--hover);color:var(--green)}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:900px){
+    .side{position:static;width:auto;padding:calc(14px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px))}
+    .brand{gap:9px;padding:0 2px 12px}
+    .brand img,.brand span{width:112px}
+    .brand span{font-size:9px}
+    .navlbl,.keys{display:none}
+    .side .user{margin-top:10px;padding:10px 2px 0;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .nav{display:flex;overflow-x:auto;gap:6px;padding-top:12px;scrollbar-width:none}
+    .nav::-webkit-scrollbar{display:none}
+    .nav button{display:flex;flex:none;gap:7px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.06)}
+    .nav small,.nav em{display:none}
+    .main{margin-left:0;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-top:20px}
+    .head img{width:84px}
+    .head h1{font-size:24px}
+    .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+    .bgrid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+    .bc .bd b{font-size:17px}
+    .bc .bd span{white-space:normal}
+    .pg .ft{padding:7px 4px 7px 9px}
+    .pg .ft .ic.pr{display:none}
+    .pk{grid-template-columns:1fr} .pk .acts{justify-content:stretch}
+    .segs,.floors{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)));padding-right:16px}
+    .segs::-webkit-scrollbar,.floors::-webkit-scrollbar{display:none}
+    .segs button,.floors button,.floors > span{flex:none;white-space:nowrap}
+  }
+  @media (max-width:640px){
+    .fabbtn{width:54px;height:54px;padding:0;justify-content:center} .fabbtn span{display:none}
+    body.presenting .fab{bottom:calc(122px + env(safe-area-inset-bottom,0px))}
+    input[type=range]{display:none} .ui{gap:2px} .ui button{padding:11px 10px} .ui .zb span{display:none}
+    .ptop .pb,.ptop a{display:none}
+    .acts{width:100%} .acts .btn{flex:1;justify-content:center}
+    .zbar .fitl,.zname,.zbar .sep,.ztip .long{display:none} .ztip .short{display:inline}
+    .zbar{gap:2px;flex-wrap:nowrap} .zbar button{padding:10px 9px;min-width:36px} .zbar .count{min-width:56px} .zbar .pct{min-width:48px}
+    .zbar .close{font-size:0} .zbar .close::after{content:"✕";font-size:15px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .leaf,.book,.tilt,.present,.toast{transition:none!important}
+    .leaf.moving .face::before,.pg.flash{animation:none}
+  }
+</style>
+</head>
+<body>
+
+<aside class="side">
+  <div class="brand"><img src="img/logo-light.svg" alt="Sarajka – stambeno-poslovni centar" width="150" height="90"><span>Prodajni panel</span></div>
+  <label class="search">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="q" type="search" placeholder="Traži: sprat 7, etaža -2, lokacija…" autocomplete="off" aria-label="Pretraga stranica u svim brošurama">
+    <kbd id="qk">/</kbd><button class="clr" id="qx" aria-label="Obriši pretragu" hidden>×</button>
+  </label>
+  <p class="navlbl">Brošure</p>
+  <nav class="nav" id="nav" aria-label="Brošure"></nav>
+  <div class="keys">
+    <div><kbd>/</kbd>pretraga · <kbd>P</kbd>prezentacija</div>
+    <div><kbd>Z</kbd>zum · <kbd>←</kbd><kbd>→</kbd>listanje · <kbd>Esc</kbd>nazad</div>
+    <div><a href="https://www.sarajka.ba" target="_blank" rel="noopener">www.sarajka.ba</a></div>
+  </div>
+</aside>
+
+<main class="main" id="main">
+  <section id="view-home" hidden>
+    <div class="hgrp" style="margin-bottom:30px">
+      <h3>Linkovi za klijente</h3>
+      <div class="packs" id="packs"></div>
+    </div>
+    <div class="rhead"><h2>Sve brošure</h2><span id="homeCount"></span></div>
+    <div class="home" id="home"></div>
+  </section>
+  <section id="view-bro" hidden>
+    <header class="head">
+      <div class="t">
+        <img id="hCover" alt="">
+        <div>
+          <h1 id="hName">Lamela A</h1>
+          <p id="hLine"></p>
+          <div class="stats" id="hStats"></div>
+        </div>
+      </div>
+      <div class="acts">
+        <button class="btn" id="copyBro"><svg viewBox="0 0 24 24"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>Link za klijenta</button>
+        <a class="btn" id="waBro" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/></svg>WhatsApp</a>
+        <button class="btn gold" id="presentBtn"><svg viewBox="0 0 24 24"><path d="M3 4h18v12H3z"/><path d="M12 16v4M8 20h8"/><path d="m10 8 4 2-4 2z" fill="currentColor"/></svg>Prezentuj klijentu</button>
+      </div>
+    </header>
+    <div class="tools">
+      <div class="segs" id="segs" role="group" aria-label="Dio brošure"></div>
+      <div class="floors" id="floors"></div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+  <section id="view-search" hidden>
+    <div class="rhead"><h2>Rezultati pretrage</h2><span id="rCount"></span></div>
+    <div class="grid" id="rgrid"></div>
+    <p class="empty" id="rEmpty" hidden></p>
+  </section>
+</main>
+
+<section class="cshelf" id="cshelf" hidden>
+  <div class="wrap">
+    <div class="ctop"><img src="img/logo.svg" alt="Sarajka – stambeno-poslovni centar" width="150" height="90"><a href="https://www.sarajka.ba" target="_blank" rel="noopener">www.sarajka.ba</a></div>
+    <div>
+      <p class="eyebrow">Stambeno poslovni centar Sarajka</p>
+      <h1 id="cTitle"></h1>
+      <p class="lead" id="cLead"></p>
+    </div>
+    <div class="bgrid" id="cgrid"></div>
+  </div>
+</section>
+
+<div class="present" id="present" aria-hidden="true">
+  <div class="ptop">
+    <img class="pb" src="img/logo.svg" alt="Sarajka" width="76" height="46">
+    <span class="pn"><i></i><span id="pName">Lamela A</span><small id="pLabel"></small></span>
+    <span class="sp"></span>
+    <a href="https://www.sarajka.ba" target="_blank" rel="noopener">www.sarajka.ba</a>
+    <button class="x" id="pClose">Zatvori prezentaciju</button>
+  </div>
+  <div class="stage" id="stage" aria-label="Brošura">
+    <div class="tilt" id="tilt">
+      <div class="book" id="book"><div class="floor l"></div><div class="floor r"></div></div>
+    </div>
+  </div>
+  <p class="hint" id="hint">Kliknite na stranicu, prevucite ili koristite strelice · lupa za zum</p>
+  <nav class="ui" aria-label="Navigacija brošure">
+    <button id="prev" aria-label="Prethodna stranica">‹ Nazad</button>
+    <input type="range" id="range" min="0" value="0" aria-label="Idi na stranicu">
+    <span class="count" id="count" aria-live="polite">1 / 1</span>
+    <button id="next" aria-label="Sljedeća stranica">Naprijed ›</button>
+    <button id="zbtn" class="zb" aria-label="Zum"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6"/></svg><span>Zum</span></button>
+  </nav>
+</div>
+
+<div class="zoom" id="zoom" role="dialog" aria-modal="true" aria-label="Zum stranice" hidden>
+  <div class="zview" id="zview">
+    <div class="zcan" id="zcan"></div>
+    <p class="zname"><i></i><span id="zname"></span></p>
+    <p class="ztip" id="ztip"><span class="long">Točkić miša ili prsti za zum · prevucite za pomjeranje · dvoklik za uvećanje</span><span class="short">Dva prsta za zum · prevucite za sljedeću stranicu</span></p>
+  </div>
+  <div class="zbar">
+    <button id="zprev" aria-label="Prethodna stranica">‹</button>
+    <span class="count" id="zcount">1 / 1</span>
+    <button id="znext" aria-label="Sljedeća stranica">›</button>
+    <span class="sep"></span>
+    <button id="zout" aria-label="Umanji">−</button>
+    <span class="pct" id="zpct" aria-live="polite">100%</span>
+    <button id="zin" aria-label="Uvećaj">+</button>
+    <button id="zfit" class="fitl">Cijela stranica</button>
+    <span class="sep"></span>
+    <button id="zlink" class="fitl">Kopiraj link</button>
+    <button id="zclose" class="close" aria-label="Zatvori zum">Zatvori ✕</button>
+  </div>
+</div>
+
+<div class="fab" id="fab">
+  <div class="fabmenu" id="fabmenu" role="dialog" aria-label="Kontakt" hidden>
+    <header><img src="img/logo-light.svg" alt="" width="64" height="38"><div><b>Kontaktirajte nas</b><small>Stambeno poslovni centar Sarajka</small></div></header>
+    <div class="fi">
+      <span class="ico"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></span>
+      <a href="tel:+38733762222"><b>Pozovite nas</b><span>033 762 222</span></a>
+      <button class="cpy" data-copy="033 762 222" data-what="broj telefona">Kopiraj</button>
+    </div>
+    <div class="fi">
+      <span class="ico"><svg viewBox="0 0 24 24"><path d="M3 6h18v12H3z"/><path d="m3 7 9 6 9-6"/></svg></span>
+      <a href="mailto:info@sarajka.ba?subject=Upit%20%E2%80%93%20Sarajka"><b>Pošaljite e-mail</b><span>info@sarajka.ba</span></a>
+      <button class="cpy" data-copy="info@sarajka.ba" data-what="e-mail adresa">Kopiraj</button>
+    </div>
+    <div class="fi">
+      <span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span>
+      <a href="https://www.sarajka.ba" target="_blank" rel="noopener"><b>Web stranica</b><span>www.sarajka.ba</span></a>
+      <span></span>
+    </div>
+  </div>
+  <button class="fabbtn" id="fabbtn" aria-expanded="false" aria-controls="fabmenu" aria-label="Kontakt"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg><span>Kontakt</span></button>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="copybox" id="copybox" hidden>
+  <div>
+    <b>Kopirajte link</b>
+    <input id="copyIn" readonly aria-label="Link">
+    <p>Preglednik nije dozvolio automatsko kopiranje. Link je označen, pritisnite Ctrl+C (ili dugi dodir → Kopiraj).</p>
+    <button class="btn pri" id="copyOk">Gotovo</button>
+  </div>
+</div>
+
+<script>/*__SARAJKA_CONFIG__*/</script>
+<script>
+/* Javni link na kojem je panel objavljen – koristi se za linkove koje šaljete klijentima.
+   Na vlastitoj web stranici ostavite prazno ('') pa se koristi adresa stranice. */
+const SHARE_URL = 'https://claude.ai/artifact/LrHnyETTFQMw8H83Bq2uBw';
+/* Na serveru (PHP) stranica dobija postavke u window.SARAJKA: način rada, pakete, korisnika i javnu adresu. */
+const CFG = window.SARAJKA || {};
+const SERVER = !!CFG.mode, CLIENT_ONLY = CFG.mode === 'client';
+
+const LABELS = {"vanjsko":[["Situacija kompleksa – ulazi i garaže","lok"]],"lamela-a":[["Naslovnica","uvod"],["Vizualizacija kompleksa","uvod"],["O projektu","uvod"],["Sarajka – novi dom","uvod"],["Vizualizacija","uvod"],["Lokacija","lok"],["Lokacija – udaljenosti","lok"],["Eksterijer","ext"],["Enterijer","ext"],["Ponuda stanova","uvod"],["Enterijer – fotografija","ext"],["Sprat 4","plan"],["Sprat 5","plan"],["Sprat 6","plan"],["Sprat 7","plan"],["Sprat 8","plan"],["Sprat 9","plan"],["Sprat 10","plan"],["Sprat 11","plan"],["Sprat 12","plan"],["Sprat 13","plan"],["Sprat 14","plan"],["Sprat 15","plan"],["Sprat 16","plan"],["Sprat 17","plan"],["Sprat 18","plan"],["Sprat 19","plan"],["Sprat 20","plan"],["Sprat 21","plan"],["Sprat 22","plan"],["Sprat 23","plan"],["Galerija","gal"],["Galerija – fotografija","gal"],["Galerija – fotografija","gal"],["Galerija – kolaž","gal"],["Kontakt","kon"]],"lamela-bc":[["Naslovnica","uvod"],["Vizualizacija kompleksa","uvod"],["O projektu","uvod"],["Sarajka – novi dom","uvod"],["Vizualizacija","uvod"],["Lokacija","lok"],["Lokacija – udaljenosti","lok"],["Eksterijer","ext"],["Enterijer","ext"],["Ponuda stanova","uvod"],["Enterijer – fotografija","ext"],["Sprat 2 – poslovni/studio","plan"],["Sprat 3 – poslovni/studio","plan"],["Sprat 4","plan"],["Sprat 5","plan"],["Sprat 6","plan"],["Sprat 7","plan"],["Sprat 8","plan"],["Sprat 9","plan"],["Sprat 10","plan"],["Sprat 11","plan"],["Sprat 12","plan"],["Sprat 13","plan"],["Sprat 14","plan"],["Galerija","gal"],["Galerija – fotografija","gal"],["Galerija – fotografija","gal"],["Galerija – kolaž","gal"],["Bilješke","kon"],["Kontakt","kon"]],"lamela-d":[["Naslovnica","uvod"],["Vizualizacija kompleksa","uvod"],["O projektu","uvod"],["Sarajka – novi dom","uvod"],["Vizualizacija","uvod"],["Lokacija","lok"],["Lokacija – udaljenosti","lok"],["Eksterijer","ext"],["Enterijer","ext"],["Ponuda stanova","uvod"],["Enterijer – fotografija","ext"],["Sprat 2 – poslovni/studio","plan"],["Sprat 3 – poslovni/studio","plan"],["Sprat 4","plan"],["Sprat 5","plan"],["Sprat 6","plan"],["Sprat 7","plan"],["Sprat 8","plan"],["Sprat 9","plan"],["Sprat 10","plan"],["Sprat 11","plan"],["Sprat 12","plan"],["Sprat 13","plan"],["Sprat 14","plan"],["Sprat 15","plan"],["Sprat 16","plan"],["Sprat 17","plan"],["Sprat 18","plan"],["Sprat 19","plan"],["Sprat 20","plan"],["Sprat 21","plan"],["Sprat 22","plan"],["Sprat 23","plan"],["Galerija","gal"],["Galerija – fotografija","gal"],["Galerija – fotografija","gal"],["Galerija – kolaž","gal"],["Kontakt","kon"]],"lamela-e":[["Naslovnica","uvod"],["Vizualizacija kompleksa","uvod"],["O projektu","uvod"],["Sarajka – novi dom","uvod"],["Vizualizacija","uvod"],["Lokacija","lok"],["Lokacija – udaljenosti","lok"],["Eksterijer","ext"],["Enterijer","ext"],["Ponuda stanova","uvod"],["Enterijer – fotografija","ext"],["Ulaz u objekat","plan"],["Sprat 4","plan"],["Sprat 5","plan"],["Sprat 6","plan"],["Sprat 7","plan"],["Sprat 8","plan"],["Galerija","gal"],["Galerija – fotografija","gal"],["Galerija – fotografija","gal"],["Galerija – kolaž","gal"],["Kontakt","kon"]],"poslovni":[["Naslovnica","uvod"],["Vizualizacija kompleksa","uvod"],["Terasa – vizualizacija","uvod"],["Ponuda poslovnih prostora","uvod"],["Situacija naselja","lok"],["Lamela A i E – Prizemlje","plan"],["Lamela A i E – Etaža 1","plan"],["Lamela A i E – Etaža 2","plan"],["Lamela A i E – Etaža 3","plan"],["Lamela B i C – Prizemlje","plan"],["Lamela B i C – Etaža 1","plan"],["Lamela B i C – Etaža 2","plan"],["Lamela B i C – Etaža 3","plan"],["Lamela D – Prizemlje","plan"],["Lamela D – Etaža 1","plan"],["Kontakt","kon"]],"podzemne":[["Naslovnica","uvod"],["Ulaz u garažu","uvod"],["Ulaz u garažu","uvod"],["Ponuda parking mjesta i ostava","uvod"],["Situacija naselja","lok"],["Etaža -4 – dio 1","plan"],["Etaža -4 – dio 2","plan"],["Etaža -3 – dio 1","plan"],["Etaža -3 – dio 2","plan"],["Etaža -2 – dio 1","plan"],["Etaža -2 – dio 2","plan"],["Etaža -1 – dio 1","plan"],["Etaža -1 – dio 2","plan"],["Kontakt","kon"]],"sarajka":[["Naslovnica","uvod"],["Vaš novi dom","uvod"],["Sarajka","uvod"],["Sarajevo","lok"],["Sarajevo – grad","lok"],["Novo lice Sarajeva","uvod"],["Vizualizacija","uvod"],["O projektu","uvod"],["O projektu – detalji","uvod"],["Vizualizacija kompleksa","uvod"],["Lokacija","lok"],["Lokacija – fotografija","lok"],["Vanjsko uređenje","lok"],["Eksterijer","ext"],["Eksterijer – detalji","ext"],["Enterijer","ext"],["Enterijer – detalji","ext"],["Vizualizacija","gal"],["Galerija","gal"],["Galerija – fotografija","gal"],["Galerija – fotografija","gal"],["Galerija – kolaž","gal"],["Bilješke","kon"],["Kontakt","kon"]]}
+;
+const SECS = {uvod:'Uvod', lok:'Lokacija', ext:'Eksterijer i enterijer', plan:'Tlocrti', gal:'Galerija', kon:'Kontakt'};
+const BROS = [
+  {id:'sarajka',   name:'Sarajka – glavna',      short:'Sarajka',  color:'#134A3A', line:'Glavna brošura kompleksa', cline:'Projekat i lokacija'},
+  {id:'vanjsko',   name:'Vanjsko uređenje',      short:'Situacija', color:'#5E7F52', line:'Situacija kompleksa · ulazi i garaže', cline:'Objekti, ulazi i garaža'},
+  {id:'lamela-a',  name:'Lamela A',              short:'A',        color:'#BAA592', line:'Stanovi · sprat 4–23', cline:'Stanovi od 4. do 23. sprata'},
+  {id:'lamela-bc', name:'Lamela B-C',            short:'B-C',      color:'#1A3A2B', line:'Stanovi · sprat 2–14', cline:'Stanovi od 2. do 14. sprata'},
+  {id:'lamela-d',  name:'Lamela D',              short:'D',        color:'#09486B', line:'Stanovi · sprat 2–23', cline:'Stanovi od 2. do 23. sprata'},
+  {id:'lamela-e',  name:'Lamela E',              short:'E',        color:'#8074BE', line:'Stanovi · sprat 4–8', cline:'Stanovi od 4. do 8. sprata'},
+  {id:'poslovni',  name:'Poslovni prostori',     short:'Poslovni', color:'#951A1F', line:'Lamele A i E, B i C, D', cline:'Lamele A i E, B i C te D'},
+  {id:'podzemne',  name:'Parking i ostave',      short:'Garaže',   color:'#E8B412', line:'Podzemne etaže −1 do −4', cline:'Podzemne etaže −1 do −4'}
+];
+BROS.forEach(b => { b.labels = LABELS[b.id]; b.pages = b.labels.length; b.plans = b.labels.filter(l => l[1] === 'plan').length; });
+
+const R = 841.89 / 595.276;
+const nn = i => String(i+1).padStart(2,'0');
+const src = (b, i) => `img/${b.id}/${nn(i)}.jpg`;
+const SC = 6;  // sličice su spojene u jednu sliku po brošuri (6 kolona)
+const thumbStyle = (b, i) => { const rows = Math.ceil(b.pages / SC), c = i % SC, r = Math.floor(i / SC);
+  return `background-image:url(sprite/${b.id}.jpg);background-size:${SC*100}% ${rows*100}%;background-position:${c/(SC-1)*100}% ${rows>1 ? r/(rows-1)*100 : 0}%`; };
+const $ = id => document.getElementById(id);
+const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fold = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d').replace(/[−–]/g,'-');
+const isTop = (() => { try { return window.self === window.top; } catch(e) { return false; } })();
+const BASE = CFG.publicUrl || ((!isTop && SHARE_URL) ? SHARE_URL : location.href.split('#')[0]);
+const linkFor = (b, i) => BASE + '#k-' + b.id + (i != null ? '-' + (i+1) : '');
+
+const ICON = {
+  zoom:'<svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6"/></svg>',
+  play:'<svg viewBox="0 0 24 24"><path d="M3 4h18v12H3z"/><path d="M12 16v4M8 20h8"/></svg>',
+  link:'<svg viewBox="0 0 24 24"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>'
+};
+
+/* ---------- toast + copy ---------- */
+let tt;
+function toast(msg){ const t = $('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('on'), 2400); }
+function copy(text, what){
+  const fallback = () => { $('copyIn').value = text; $('copybox').hidden = false; $('copyIn').focus(); $('copyIn').select(); };
+  try {
+    navigator.clipboard.writeText(text).then(() => toast(`Link kopiran: ${what}`), fallback);
+  } catch(e){ fallback(); }
+}
+$('copyOk').onclick = () => { $('copybox').hidden = true; };
+
+/* natpis "Prodajni panel" iste širine kao logotip */
+function fitBrand(){
+  const sp = document.querySelector('.brand span'), img = document.querySelector('.brand img');
+  if (!sp || !img) return;
+  const w = img.getBoundingClientRect().width; if (!w) return;
+  sp.style.letterSpacing = '0px'; sp.style.width = 'auto'; sp.style.display = 'inline-block';
+  const tw = sp.getBoundingClientRect().width, n = sp.textContent.length;
+  sp.style.display = ''; sp.style.width = '';
+  sp.style.letterSpacing = Math.max(0, (w - tw) / (n - 1)) + 'px';
+  sp.style.marginRight = '-' + sp.style.letterSpacing;
+}
+addEventListener('resize', fitBrand);
+document.querySelector('.brand img').addEventListener('load', fitBrand);
+if (document.fonts) document.fonts.ready.then(fitBrand);
+fitBrand();
+
+/* ---------- kontakt ---------- */
+function fabToggle(open){
+  const m = $('fabmenu'); open = open ?? m.hidden;
+  m.hidden = !open; $('fabbtn').setAttribute('aria-expanded', open);
+}
+$('fabbtn').onclick = e => { e.stopPropagation(); fabToggle(); };
+$('fabmenu').addEventListener('click', e => e.stopPropagation());
+document.addEventListener('click', () => { if (!$('fabmenu').hidden) fabToggle(false); });
+document.querySelectorAll('.fi .cpy').forEach(b => b.onclick = () => {
+  const t = b.dataset.copy, fb = () => { $('copyIn').value = t; $('copybox').hidden = false; $('copyIn').select(); };
+  try { navigator.clipboard.writeText(t).then(() => toast(`Kopirano: ${t}`), fb); } catch(e){ fb(); }
+});
+
+/* ---------- panel ---------- */
+let sel = null, secF = 'all', view = 'home';
+{
+  const h = document.createElement('button');
+  h.dataset.id = 'home'; h.className = 'all';
+  h.innerHTML = `<i><svg viewBox="0 0 12 12" fill="currentColor"><rect width="5" height="5"/><rect x="7" width="5" height="5"/><rect y="7" width="5" height="5"/><rect x="7" y="7" width="5" height="5"/></svg></i><b>Sve brošure</b><small>${BROS.length}</small><em>Pregled svih naslovnica</em>`;
+  h.onclick = () => { clearSearch(); showHome(); };
+  $('nav').appendChild(h);
+}
+BROS.forEach(b => {
+  const btn = document.createElement('button');
+  btn.dataset.id = b.id; btn.style.setProperty('--c', b.color);
+  btn.innerHTML = `<i></i><b>${esc(b.name)}</b><small>${b.pages} str.</small><em>${esc(b.line)}${b.plans ? ' · ' + b.plans + ' tlocrta' : ''}</em>`;
+  btn.onclick = () => { clearSearch(); selectBro(b.id); };
+  $('nav').appendChild(btn);
+});
+
+function card(b, i, showBro){
+  const [label, sec] = b.labels[i];
+  const el = document.createElement('article');
+  el.className = 'pg'; el.style.setProperty('--c', b.color); el.dataset.i = i;
+  el.innerHTML = `<button class="im" aria-label="Zum: ${esc(b.name)}, ${esc(label)}"><span class="th" style="${thumbStyle(b,i)}"></span><span class="no">${i+1}</span>${sec === 'plan' ? '<span class="tag plan">Tlocrt</span>' : ''}</button>
+    <div class="ft"><div class="lb"><b title="${esc(label)}">${esc(label)}</b><small>${showBro ? `<i></i>${esc(b.name)} · ` : ''}${SECS[sec]}</small></div>
+    <button class="ic pr" title="Prezentuj od ove stranice" aria-label="Prezentuj od ove stranice">${ICON.play}</button>
+    <button class="ic ln" title="Kopiraj link za klijenta" aria-label="Kopiraj link za klijenta">${ICON.link}</button></div>`;
+  el.querySelector('.im').onclick = () => openPageZoom(b, i);
+  el.querySelector('.pr').onclick = () => present(b, i);
+  el.querySelector('.ln').onclick = () => copy(linkFor(b, i), `${b.name} – ${label}`);
+  return el;
+}
+
+/* Paketi brošura za klijente – svaki ima svoj link (#z-…). Uredite popise po potrebi. */
+const PACKS = CFG.packs || [
+  {id:'stanovi', title:'Stanovi – Lamele A i B-C', ids:['sarajka','lamela-a','lamela-bc','vanjsko','podzemne'],
+   lead:'Pronađite svoj novi dom u Sarajki. Pogledajte stanove u Lamelama A i B-C s tlocrtom svakog sprata, raspored objekata i ulaza, te parking mjesta i ostave u podzemnoj garaži.'},
+  {id:'garaze',  title:'Parking mjesta i ostave', ids:['podzemne'],
+   lead:'Sigurno parking mjesto i ostava u podzemnoj garaži Sarajke, na etažama −1 do −4.'},
+  {id:'poslovni',title:'Poslovni prostori', ids:['poslovni'],
+   lead:'Poslovni prostori u prizemlju i na prvim etažama Sarajke, na prometnoj lokaciji u srcu Sarajeva.'}
+];
+const packLink = pk => SERVER ? BASE + '?p=' + pk.id : BASE + '#z-' + pk.id;
+function buildPacks(){
+  const box = $('packs');
+  PACKS.forEach(pk => {
+    const el = document.createElement('div'); el.className = 'pk';
+    const inc = pk.ids.filter(id => BROS.some(x => x.id === id)).map(id => { const b = BROS.find(x => x.id === id); return `<span style="--c:${b.color}"><i></i>${esc(b.name)}</span>`; }).join('');
+    el.innerHTML = `<div><h4>${esc(pk.title)}${pk.active === false ? ' <small class="off">neaktivan</small>' : ''}</h4><div class="inc">${inc}</div></div>
+      <div class="acts">
+        <button class="btn cp">${ICON.link}Kopiraj link</button>
+        <a class="btn" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent('Sarajka – ' + pk.title + ': ' + packLink(pk))}"><svg viewBox="0 0 24 24"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/></svg>WhatsApp</a>
+        <a class="btn" target="_blank" rel="noopener" href="${packLink(pk)}"><svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"/></svg>Pogledaj kao klijent</a>
+      </div>`;
+    el.querySelector('.cp').onclick = () => copy(packLink(pk), pk.title);
+    box.appendChild(el);
+  });
+}
+let clientPack = null;
+function clientMessage(title, lead){
+  document.body.classList.add('client', 'cview');
+  $('cshelf').hidden = false; $('cTitle').textContent = title; $('cLead').textContent = lead; $('cgrid').innerHTML = '';
+  document.title = 'Sarajka';
+}
+function openPack(pk){
+  clientPack = pk;
+  pk = Object.assign({}, pk, {ids: pk.ids.filter(id => BROS.some(b => b.id === id))});
+  if (pk.active === false || !pk.ids.length)
+    return clientMessage(pk.title, 'Ova ponuda trenutno nije dostupna. Za više informacija kontaktirajte naš prodajni tim putem dugmeta Kontakt.');
+  document.body.classList.add('client', 'cview');
+  document.body.classList.toggle('multi', pk.ids.length > 1);
+  document.title = `${pk.title} – Sarajka`;
+  if (pk.ids.length === 1){ const b = BROS.find(x => x.id === pk.ids[0]); sel = b; present(b, 0); return; }
+  $('cshelf').hidden = false;
+  $('cTitle').textContent = pk.title; $('cLead').textContent = pk.lead;
+  const g = $('cgrid'); g.innerHTML = '';
+  pk.ids.forEach(id => {
+    const b = BROS.find(x => x.id === id);
+    const c = document.createElement('article'); c.className = 'bc'; c.style.setProperty('--c', b.color); c.style.cursor = 'pointer';
+    c.innerHTML = `<button class="cv" aria-label="Otvori ${esc(b.name)}"><img src="img/${b.id}/cover.jpg" alt="" width="640" height="453"></button>
+      <div class="bd"><i></i><b>${esc(b.name.replace(' – glavna',''))}</b><span>${esc(b.cline || b.line)}</span><span class="n">${b.pages} ${b.pages === 1 ? 'stranica' : b.pages < 5 ? 'stranice' : 'stranica'}</span></div>
+      <div class="ba"><button class="open">Otvori brošuru</button></div>`;
+    c.addEventListener('click', () => present(b, 0));
+    g.appendChild(c);
+  });
+}
+const GROUPS = [['Kompleks', ['sarajka','vanjsko']], ['Stambeni objekti', ['lamela-a','lamela-bc','lamela-d','lamela-e']], ['Poslovni prostori i garaže', ['poslovni','podzemne']]];
+function buildHome(){
+  const home = $('home');
+  GROUPS.forEach(([title, ids]) => {
+    const g = document.createElement('div'); g.className = 'hgrp';
+    g.innerHTML = `<h3>${title}</h3><div class="bgrid"></div>`;
+    ids.forEach(id => {
+      const b = BROS.find(x => x.id === id);
+      const c = document.createElement('article'); c.className = 'bc'; c.style.setProperty('--c', b.color);
+      c.innerHTML = `<button class="cv" aria-label="Otvori ${esc(b.name)}"><img src="img/${b.id}/cover.jpg" alt="" loading="lazy" width="640" height="453"></button>
+        <div class="bd"><i></i><b title="${esc(b.name)}">${esc(b.name)}</b><span>${esc(b.line)}</span><span class="n">${b.pages} stranica${b.plans ? ' · ' + b.plans + ' tlocrta' : ''}</span></div>
+        <div class="ba"><button class="open">Otvori</button>
+        <button class="ic pr" title="Prezentuj klijentu" aria-label="Prezentuj klijentu">${ICON.play}</button>
+        <button class="ic ln" title="Kopiraj link za klijenta" aria-label="Kopiraj link za klijenta">${ICON.link}</button></div>`;
+      c.addEventListener('click', e => { if (!e.target.closest('.ic')) selectBro(b.id); });
+      c.style.cursor = 'pointer';
+      c.querySelector('.pr').onclick = () => { sel = sel || b; present(b, 0); };
+      c.querySelector('.ln').onclick = () => copy(linkFor(b), b.name);
+      g.querySelector('.bgrid').appendChild(c);
+    });
+    home.appendChild(g);
+  });
+  $('homeCount').textContent = `${BROS.length} brošura · ${BROS.reduce((a, b) => a + b.pages, 0)} stranica · ${BROS.reduce((a, b) => a + b.plans, 0)} tlocrta`;
+}
+buildHome();
+buildPacks();
+if (CFG.user){
+  const u = document.createElement('div'); u.className = 'user';
+  const L = CFG.links || {admin: 'admin.php', logout: 'odjava.php'};
+  u.innerHTML = `<span>Prijavljeni: <b>${esc(CFG.user.name)}</b></span><span>${CFG.user.admin ? `<a href="${L.admin}">Administracija</a> · ` : ''}<a href="${L.logout}">Odjava</a></span>`;
+  document.querySelector('.keys').before(u);
+}
+function setView(v){
+  view = v;
+  $('view-home').hidden = v !== 'home'; $('view-bro').hidden = v !== 'bro';
+}
+function showHome(keepHash){
+  setView('home'); sel = null;
+  document.documentElement.style.setProperty('--acc', '#134A3A');
+  $('nav').querySelectorAll('button').forEach(x => x.setAttribute('aria-current', x.dataset.id === 'home'));
+  if (!keepHash) try { history.replaceState(null, '', '#brosure'); } catch(e) {}
+  document.title = 'Sarajka prodajni panel';
+  scrollTo(0, 0);
+}
+function selectBro(id, keepHash){
+  const b = BROS.find(x => x.id === id) || BROS[0];
+  sel = b; secF = 'all'; setView('bro'); scrollTo(0, 0);
+  document.documentElement.style.setProperty('--acc', b.color);
+  $('nav').querySelectorAll('button').forEach(x => x.setAttribute('aria-current', x.dataset.id === b.id));
+  $('hCover').src = `img/${b.id}/cover.jpg`;
+  $('hName').textContent = b.name;
+  $('hLine').textContent = b.line;
+  const counts = {};
+  b.labels.forEach(l => counts[l[1]] = (counts[l[1]] || 0) + 1);
+  $('hStats').innerHTML = `<span>${b.pages} stranica</span>` + (b.plans ? `<span>${b.plans} tlocrta</span>` : '') ;
+  $('waBro').href = 'https://wa.me/?text=' + encodeURIComponent(`Sarajka – ${b.name}: ${linkFor(b)}`);
+  // section filter
+  const segs = $('segs'); segs.innerHTML = '';
+  [['all','Sve', b.pages], ...Object.keys(SECS).filter(k => counts[k]).map(k => [k, SECS[k], counts[k]])].forEach(([k, t, c]) => {
+    const s = document.createElement('button'); s.dataset.k = k;
+    s.innerHTML = `${t} <small>${c}</small>`; s.setAttribute('aria-pressed', k === secF);
+    s.onclick = () => { secF = k; segs.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x.dataset.k === k)); drawGrid(); };
+    segs.appendChild(s);
+  });
+  // floor quick jump
+  const fl = $('floors'); fl.innerHTML = '';
+  const fp = b.labels.map((l, i) => [l[0], i]).filter(([l]) => /^Sprat \d+|Etaža -\d/.test(l));
+  if (fp.length){
+    const isP = b.id === 'podzemne';
+    fl.innerHTML = `<span>${isP ? 'Etaža' : 'Tlocrt sprata'}</span>`;
+    const seen = new Set();
+    fp.forEach(([l, i]) => {
+      const m = l.match(/Sprat (\d+)|Etaža (-\d)/); const key = m[1] || m[2];
+      if (seen.has(key)) return; seen.add(key);
+      const x = document.createElement('button'); x.textContent = key.replace('-', '−');
+      x.title = `${b.name} – ${l}`; x.onclick = () => openPageZoom(b, i);
+      fl.appendChild(x);
+    });
+  }
+  fl.hidden = !fp.length;
+  drawGrid();
+  if (!keepHash) try { history.replaceState(null, '', '#' + b.id); } catch(e) {}
+  document.title = `${b.name} – Sarajka prodajni panel`;
+}
+function drawGrid(){
+  const g = $('grid'); g.innerHTML = '';
+  const f = document.createDocumentFragment();
+  sel.labels.forEach((l, i) => { if (secF === 'all' || l[1] === secF) f.appendChild(card(sel, i, false)); });
+  g.appendChild(f);
+}
+
+/* ---------- search ---------- */
+const INDEX = [];
+BROS.forEach(b => b.labels.forEach((l, i) => INDEX.push({b, i, words: fold(`${b.name} ${b.short} ${l[0]} ${SECS[l[1]]}`).split(/[^a-z0-9-]+/).filter(Boolean)})));
+function search(q){
+  const toks = fold(q).split(/[\s,]+/).filter(Boolean);
+  if (!toks.length) return clearSearch(true);
+  $('view-bro').hidden = true; $('view-home').hidden = true; $('view-search').hidden = false;
+  const hits = INDEX.filter(r => toks.every(t => /^-?\d+$/.test(t)
+      ? r.words.some(w => w === t || (w === '-' + t && r.words.includes('etaza')))
+      : r.words.some(w => w.startsWith(t))));
+  const g = $('rgrid'); g.innerHTML = '';
+  hits.slice(0, 120).forEach(h => g.appendChild(card(h.b, h.i, true)));
+  $('rCount').textContent = hits.length ? `${hits.length} ${hits.length === 1 ? 'stranica' : hits.length < 5 ? 'stranice' : 'stranica'}` : '';
+  $('rEmpty').hidden = !!hits.length;
+  $('rEmpty').innerHTML = `Nema stranica za <b>„${esc(q)}“</b>. Pokušajte npr. <b>sprat 7</b>, <b>etaža -2</b>, <b>lamela d</b>, <b>poslovni prizemlje</b> ili <b>galerija</b>.`;
+  $('qx').hidden = false; $('qk').hidden = true;
+}
+function clearSearch(keepInput){
+  if (!keepInput) $('q').value = '';
+  $('view-search').hidden = true; setView(view);
+  $('qx').hidden = true; $('qk').hidden = false;
+}
+$('q').addEventListener('input', e => search(e.target.value));
+$('qx').onclick = () => { clearSearch(); $('q').focus(); };
+
+$('copyBro').onclick = () => copy(linkFor(sel), sel.name);
+$('presentBtn').onclick = () => present(sel, 0);
+
+/* ---------- flip-book (prezentacija) ---------- */
+const book = $('book'), tilt = $('tilt'), range = $('range'), count = $('count');
+const prevB = $('prev'), nextB = $('next'), hint = $('hint');
+let cur = null, PAGES = [], N = 0, imgs = [];
+let single = null, leaves = [], n = 0, page = 0, presenting = false;
+
+function face(cls, i){
+  const f = document.createElement('div'); f.className = 'face ' + cls;
+  if (i != null && i < N){
+    const im = new Image(); im.alt = 'Stranica ' + (i+1); im.decoding = 'async'; im.draggable = false;
+    im.onload = () => im.classList.add('ok');
+    imgs[i] = im; f.appendChild(im);
+  }
+  return f;
+}
+function want(i){ const im = imgs[i]; if (im && !im.src) im.src = PAGES[i]; }
+function preload(){ for (let i = page - 3; i <= page + 6; i++) if (i >= 0 && i < N) want(i); }
+function build(){
+  leaves.forEach(l => l.remove()); leaves = []; imgs = [];
+  book.classList.toggle('single', single);
+  const L = single ? N : Math.ceil(N/2);
+  for (let i = 0; i < L; i++){
+    const leaf = document.createElement('div'); leaf.className = 'leaf';
+    if (single) leaf.appendChild(face('front', i));
+    else { leaf.appendChild(face('front', 2*i)); leaf.appendChild(face('back', 2*i+1)); }
+    book.appendChild(leaf); leaves.push(leaf);
+  }
+  n = single ? page : Math.ceil(page/2);
+  range.max = single ? N - 1 : leaves.length;
+  leaves.forEach(l => l.style.transition = 'none');
+  render(); void book.offsetWidth;
+  leaves.forEach(l => l.style.transition = '');
+}
+function layout(force){
+  const vw = innerWidth, vh = innerHeight, h = vh - 170;
+  const s = vw < 760 || vw / vh < 1.15 || (presenting && N === 1);
+  const pw = s ? Math.min(vw - 32, h * R) : Math.min((vw - 72) / 2, h * R);
+  document.documentElement.style.setProperty('--pw', pw + 'px');
+  document.documentElement.style.setProperty('--ph', (pw / R) + 'px');
+  if (presenting && (s !== single || force)){ single = s; build(); } else single = s;
+}
+function shownPages(){
+  if (single) return [n];
+  const L = leaves.length;
+  if (n === 0) return [0];
+  if (n === L) return [N - 1];
+  return [2*n - 1, 2*n].filter(i => i < N);
+}
+function render(){
+  const L = leaves.length;
+  leaves.forEach((lf, i) => {
+    const flipped = i < n, z = (flipped ? i : L - i) * 0.6;
+    if (single){ lf.style.transform = `translateZ(${z}px) rotateY(${flipped ? -110 : 0}deg)`; lf.classList.toggle('gone', flipped); }
+    else lf.style.transform = `translateZ(${z}px) rotateY(${flipped ? -180 : 0}deg)`;
+  });
+  if (single){
+    book.style.transform = 'none'; page = n;
+    count.textContent = `${n+1} / ${N}`;
+    prevB.disabled = n === 0; nextB.disabled = n === N - 1;
+  } else {
+    const shift = n === 0 ? -0.5 : n === L ? 0.5 : 0;
+    book.style.transform = `translateX(calc(var(--pw) * ${shift}))`;
+    book.classList.toggle('at-start', n === 0); book.classList.toggle('at-end', n === L);
+    page = n === 0 ? 0 : 2*n - 1;
+    count.textContent = n === 0 ? `1 / ${N}` : n === L ? `${N} / ${N}` : `${2*n}–${Math.min(2*n+1, N)} / ${N}`;
+    prevB.disabled = n === 0; nextB.disabled = n === L;
+  }
+  range.value = n;
+  if (cur) $('pLabel').textContent = '· ' + [...new Set(shownPages().map(i => cur.labels[i][0]))].join(' / ');
+  preload();
+}
+function go(target){
+  const max = single ? N - 1 : leaves.length;
+  target = Math.max(0, Math.min(max, target));
+  if (target === n) return;
+  const lo = Math.min(n, target), hi = Math.max(n, target), fwd = target > n;
+  for (let i = lo; i < hi; i++){
+    const lf = leaves[i], order = fwd ? i - lo : hi - 1 - i, d = Math.min(order * 70, 700);
+    lf.style.transitionDelay = `${d}ms, ${d + 550}ms`;
+    lf.classList.remove('moving'); void lf.offsetWidth; lf.classList.add('moving');
+    setTimeout(() => { lf.classList.remove('moving'); lf.style.transitionDelay = ''; }, 1100 + d);
+  }
+  n = target; render(); hint.classList.add('off');
+}
+function setCur(b){
+  cur = b; N = b.pages; PAGES = Array.from({length:N}, (_, i) => src(b, i));
+  document.documentElement.style.setProperty('--acc', b.color);
+}
+function present(b, start){
+  setCur(b); page = start || 0; presenting = true;
+  $('pName').textContent = b.name;
+  document.body.classList.add('presenting'); $('present').setAttribute('aria-hidden', 'false');
+  hint.classList.remove('off');
+  $('pClose').textContent = document.body.classList.contains('multi') ? '← Sve brošure' : 'Zatvori prezentaciju';
+  layout(true);
+}
+function closePresent(){
+  presenting = false;
+  document.body.classList.remove('presenting'); $('present').setAttribute('aria-hidden', 'true');
+  document.documentElement.style.setProperty('--acc', view === 'bro' && sel ? sel.color : '#134A3A');
+  if (document.body.classList.contains('client') && !document.body.classList.contains('multi')){ document.body.classList.remove('client', 'cview'); if (sel) selectBro(sel.id); }
+}
+prevB.onclick = e => { e.stopPropagation(); go(n - 1); };
+nextB.onclick = e => { e.stopPropagation(); go(n + 1); };
+range.oninput = () => go(+range.value);
+$('pClose').onclick = closePresent;
+
+const stage = $('stage');
+let sx = null;
+stage.addEventListener('pointerdown', e => { sx = e.clientX; });
+stage.addEventListener('pointerup', e => {
+  if (sx == null) return;
+  const dx = e.clientX - sx; sx = null;
+  if (dx < -40) go(n + 1); else if (dx > 40) go(n - 1);
+  else if (Math.abs(dx) < 8) go(e.clientX > innerWidth / 2 ? n + 1 : n - 1);
+});
+stage.addEventListener('pointermove', e => {
+  if (e.pointerType !== 'mouse' || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const x = e.clientX / innerWidth - .5, y = e.clientY / innerHeight - .5;
+  tilt.style.transform = `rotateX(${5 - y * 8}deg) rotateY(${x * 10}deg)`;
+});
+stage.addEventListener('pointerleave', () => { tilt.style.transform = ''; });
+stage.addEventListener('touchstart', e => { if (e.touches.length >= 2){ e.preventDefault(); sx = null; zOpenBook(); } }, {passive:false});
+['gesturestart','gesturechange'].forEach(ev => stage.addEventListener(ev, e => e.preventDefault()));
+
+/* ---------- zoom ---------- */
+const zoom = $('zoom'), zview = $('zview'), zcan = $('zcan'), ztip = $('ztip');
+const ZW = 1600, ZH = ZW / R;
+let zs = 1, zx = 0, zy = 0, zfit = 1, zcount = 1, zopen = false, zMode = 'book', zIdx = 0, zB = null;
+const zsrc = (b, i) => b.id === 'sarajka' ? src(b, i) : `zoom/${b.id}/${nn(i)}.jpg`;
+
+function zPages(){ return zMode === 'book' ? shownPages() : [zIdx]; }
+function zApply(anim){
+  zcan.classList.toggle('anim', !!anim);
+  zcan.style.transform = `translate(${zx}px,${zy}px) scale(${zs})`;
+  $('zpct').textContent = Math.round(zs / zfit * 100) + '%';
+  $('zout').disabled = zs <= zfit * 1.001;
+  $('zin').disabled = zs >= zfit * 8 * 0.999;
+}
+function zClamp(){
+  // stranica ostaje gdje je korisnik ostavi; rub može doći najviše do sredine ekrana
+  const vw = zview.clientWidth, vh = zview.clientHeight, w = ZW * zcount * zs, h = ZH * zs, mx = vw / 2, my = vh / 2;
+  zx = Math.min(Math.max(mx, vw - w), Math.max(Math.min(mx - w, 0), zx));
+  zy = Math.min(Math.max(my, vh - h), Math.max(Math.min(my - h, 0), zy));
+}
+function zCenter(){ const vw = zview.clientWidth, vh = zview.clientHeight; zx = (vw - ZW * zcount * zs) / 2; zy = (vh - ZH * zs) / 2; }
+function zFit(anim){
+  const vw = zview.clientWidth || innerWidth, vh = zview.clientHeight || innerHeight - 70, m = vw < 640 ? 12 : 32;
+  zfit = Math.min((vw - m) / (ZW * zcount), (vh - m) / ZH);
+  zs = zfit; zCenter(); zApply(anim);
+}
+function zAt(px, py, f, anim){
+  const ns = Math.max(zfit, Math.min(zfit * 8, zs * f));
+  zx = px - (px - zx) * ns / zs; zy = py - (py - zy) * ns / zs; zs = ns;
+  if (ns <= zfit * 1.001) zCenter(); else zClamp();
+  zApply(anim);
+}
+function zLoad(){
+  const b = zB, ps = zPages(); zcount = ps.length;
+  zcan.innerHTML = ''; zcan.style.width = (ZW * ps.length) + 'px'; zcan.style.height = ZH + 'px';
+  ps.forEach(i => {
+    const im = new Image(); im.alt = 'Stranica ' + (i+1); im.draggable = false;
+    im.src = src(b, i);
+    const hi = new Image(); hi.onload = () => { im.src = hi.src; }; hi.src = zsrc(b, i);
+    zcan.appendChild(im);
+  });
+  $('zname').textContent = `${b.name} · ${[...new Set(ps.map(i => b.labels[i][0]))].join(' / ')}`;
+  $('zcount').textContent = ps.length > 1 ? `${ps[0]+1}–${ps[1]+1} / ${b.pages}` : `${ps[0]+1} / ${b.pages}`;
+  if (zMode === 'book'){ $('zprev').disabled = prevB.disabled; $('znext').disabled = nextB.disabled; }
+  else { $('zprev').disabled = zIdx === 0; $('znext').disabled = zIdx === b.pages - 1; }
+  zFit(false);
+}
+function zShow(){
+  zopen = true; zoom.hidden = false;
+  ztip.classList.remove('off'); setTimeout(() => ztip.classList.add('off'), 3500);
+  zLoad(); $('zclose').focus();
+  requestAnimationFrame(() => zFit(false));
+}
+function zOpenBook(){ if (!presenting) return; zMode = 'book'; zB = cur; zShow(); }
+function openPageZoom(b, i){ zMode = 'page'; zB = b; zIdx = i; document.documentElement.style.setProperty('--acc', b.color); zShow(); }
+function zClose(){
+  zopen = false; zoom.hidden = true;
+  if (!presenting) document.documentElement.style.setProperty('--acc', view === 'bro' && sel ? sel.color : '#134A3A');
+}
+function zStep(d){
+  if (zMode === 'book'){ go(n + d); }
+  else zIdx = Math.max(0, Math.min(zB.pages - 1, zIdx + d));
+  zLoad();
+}
+$('zbtn').onclick = e => { e.stopPropagation(); zOpenBook(); };
+$('zclose').onclick = zClose;
+$('zfit').onclick = () => zFit(true);
+$('zin').onclick = () => zAt(zview.clientWidth / 2, zview.clientHeight / 2, 1.5, true);
+$('zout').onclick = () => zAt(zview.clientWidth / 2, zview.clientHeight / 2, 1 / 1.5, true);
+$('zprev').onclick = () => zStep(-1);
+$('znext').onclick = () => zStep(1);
+$('zlink').onclick = () => { const i = zPages()[0]; copy(linkFor(zB, i), `${zB.name} – ${zB.labels[i][0]}`); };
+
+zview.addEventListener('wheel', e => {
+  e.preventDefault();
+  const r = zview.getBoundingClientRect();
+  zAt(e.clientX - r.left, e.clientY - r.top, Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0018)));
+}, {passive:false});
+let mdrag = null;
+zview.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') return; zview.setPointerCapture(e.pointerId); zview.classList.add('drag'); mdrag = {x:e.clientX, y:e.clientY}; });
+zview.addEventListener('pointermove', e => {
+  if (e.pointerType !== 'mouse' || !mdrag) return;
+  zx += e.clientX - mdrag.x; zy += e.clientY - mdrag.y; mdrag = {x:e.clientX, y:e.clientY}; zClamp(); zApply(false);
+});
+const mUp = e => { if (e.pointerType === 'mouse'){ mdrag = null; zview.classList.remove('drag'); } };
+zview.addEventListener('pointerup', mUp); zview.addEventListener('pointercancel', mUp);
+zview.addEventListener('dblclick', e => {
+  const r = zview.getBoundingClientRect();
+  if (zs > zfit * 1.05) zFit(true); else zAt(e.clientX - r.left, e.clientY - r.top, 3, true);
+});
+let t1 = null, t2 = null, lastTap = null, raf = 0;
+const pt = (t, r) => ({x: t.clientX - r.left, y: t.clientY - r.top});
+function draw(){ if (!raf) raf = requestAnimationFrame(() => { raf = 0; zApply(false); }); }
+zview.addEventListener('touchstart', e => {
+  e.preventDefault();
+  const r = zview.getBoundingClientRect(), T = e.touches;
+  if (T.length === 1){ const p = pt(T[0], r); t1 = {x:p.x, y:p.y, sx:p.x, sy:p.y, t:Date.now(), moved:false, fit: zs <= zfit * 1.02}; t2 = null; }
+  else if (T.length >= 2){ const a = pt(T[0], r), b = pt(T[1], r); t2 = {d: Math.hypot(a.x - b.x, a.y - b.y), mx:(a.x + b.x) / 2, my:(a.y + b.y) / 2}; t1 = null; lastTap = null; }
+}, {passive:false});
+zview.addEventListener('touchmove', e => {
+  e.preventDefault();
+  const r = zview.getBoundingClientRect(), T = e.touches;
+  if (T.length >= 2 && t2){
+    const a = pt(T[0], r), b = pt(T[1], r);
+    const d = Math.hypot(a.x - b.x, a.y - b.y), mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+    const ns = Math.max(zfit * 0.85, Math.min(zfit * 8, zs * d / t2.d));
+    zx = mx - (t2.mx - zx) * ns / zs; zy = my - (t2.my - zy) * ns / zs; zs = ns;
+    t2 = {d, mx, my}; $('zpct').textContent = Math.round(zs / zfit * 100) + '%'; draw();
+  } else if (T.length === 1 && t1){
+    const p = pt(T[0], r);
+    if (Math.hypot(p.x - t1.sx, p.y - t1.sy) > 10) t1.moved = true;
+    if (t1.fit) zcan.style.transform = `translate(${zx + (p.x - t1.sx) * 0.35}px,${zy}px) scale(${zs})`;
+    else { zx += p.x - t1.x; zy += p.y - t1.y; zClamp(); draw(); }
+    t1.x = p.x; t1.y = p.y;
+  }
+}, {passive:false});
+function tEnd(e){
+  e.preventDefault();
+  const r = zview.getBoundingClientRect(), T = e.touches;
+  if (t2 && T.length < 2){
+    t2 = null;
+    if (zs <= zfit * 1.03) zFit(true); else { zClamp(); zApply(true); }
+    if (T.length === 1){ const p = pt(T[0], r); t1 = {x:p.x, y:p.y, sx:p.x, sy:p.y, t:0, moved:true, fit:false}; }
+    return;
+  }
+  if (!t1 || T.length) return;
+  const dx = t1.x - t1.sx, dy = t1.y - t1.sy, g = t1; t1 = null;
+  if (g.fit && g.moved){ if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)){ zStep(dx < 0 ? 1 : -1); return; } zApply(true); return; }
+  if (g.moved || Date.now() - g.t > 350) return;
+  const now = Date.now();
+  if (lastTap && now - lastTap.t < 330 && Math.hypot(g.sx - lastTap.x, g.sy - lastTap.y) < 40){
+    if (zs > zfit * 1.05) zFit(true); else zAt(g.sx, g.sy, 3, true);
+    lastTap = null;
+  } else lastTap = {t: now, x: g.sx, y: g.sy};
+}
+zview.addEventListener('touchend', tEnd, {passive:false});
+zview.addEventListener('touchcancel', tEnd, {passive:false});
+['gesturestart','gesturechange','gestureend'].forEach(ev => zview.addEventListener(ev, e => e.preventDefault()));
+function zResize(){ if (zopen) zFit(false); }
+addEventListener('resize', zResize);
+if (window.ResizeObserver) new ResizeObserver(zResize).observe(zview);
+
+/* ---------- keyboard ---------- */
+addEventListener('keydown', e => {
+  if (!$('fabmenu').hidden && e.key === 'Escape'){ fabToggle(false); return; }
+  if (!$('copybox').hidden){ if (e.key === 'Escape' || e.key === 'Enter') $('copybox').hidden = true; return; }
+  if (zopen){
+    if (e.key === 'Escape') zClose();
+    else if (e.key === '+' || e.key === '=') $('zin').click();
+    else if (e.key === '-') $('zout').click();
+    else if (e.key === '0') zFit(true);
+    else if (e.key === 'ArrowRight' || e.key === 'PageDown') zStep(1);
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') zStep(-1);
+    else return;
+    e.preventDefault(); return;
+  }
+  if (presenting){
+    if (e.target === range) return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') go(n + 1);
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') go(n - 1);
+    if (e.key === 'Home') go(0);
+    if (e.key === 'End') go(single ? N - 1 : leaves.length);
+    if (e.key === 'z' || e.key === 'Z' || e.key === '+') zOpenBook();
+    if (e.key === 'Escape' && (!document.body.classList.contains('client') || document.body.classList.contains('multi'))) closePresent();
+    return;
+  }
+  if (CLIENT_ONLY || document.body.classList.contains('cview')) return;
+  const typing = e.target === $('q');
+  if (e.key === '/' && !typing){ e.preventDefault(); $('q').focus(); $('q').select(); }
+  else if (e.key === 'Escape' && typing){ clearSearch(); $('q').blur(); }
+  else if ((e.key === 'p' || e.key === 'P') && !typing && sel && view === 'bro') present(sel, 0);
+});
+
+/* ---------- routing ----------
+   (prazno)/#brosure → pregled svih brošura
+   #lamela-a        → panel s odabranom brošurom
+   #z-stanovi / #z-garaze / #z-poslovni → klijentski paket brošura
+   #k-lamela-a      → klijentski link: prezentacija brošure
+   #k-lamela-a-12   → klijentski link: prezentacija + zum na stranicu 12 */
+function route(){
+  const h = location.hash.slice(1);
+  let pid = null;
+  try { pid = new URLSearchParams(location.search).get('p'); } catch(e) {}
+  const z = h.match(/^z-([a-z0-9-]+)$/);
+  if (z) pid = z[1];
+  if (pid){
+    const pk = PACKS.find(x => x.id === pid);
+    if (pk) return openPack(pk);
+    if (CLIENT_ONLY) return clientMessage('Ponuda nije pronađena', 'Link koji ste otvorili nije ispravan. Kontaktirajte naš prodajni tim putem dugmeta Kontakt.');
+  }
+  const k = h.match(/^k-([a-z-]+?)(?:-(\d+))?$/);
+  if (k){
+    const b = BROS.find(x => x.id === k[1]);
+    if (b){
+      selectBro(b.id, true);
+      document.body.classList.add('client');
+      if (CLIENT_ONLY) document.body.classList.add('cview');
+      const i = k[2] ? Math.max(0, Math.min(b.pages - 1, +k[2] - 1)) : 0;
+      present(b, i);
+      if (k[2]) openPageZoom(b, i);
+      return;
+    }
+  }
+  if (CLIENT_ONLY) return clientMessage('Sarajka brošure', 'Za pregled ponude otvorite link ili skenirajte QR kod koji ste dobili od našeg prodajnog tima.');
+  if (BROS.some(b => b.id === h)) selectBro(h, true); else showHome(true);
+}
+addEventListener('resize', () => layout(false));
+addEventListener('hashchange', route);
+layout(false);
+route();
+</script>
+</body>
+</html>

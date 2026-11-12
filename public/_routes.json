@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "include": ["/", "/panel", "/prijava", "/odjava", "/admin", "/app-shell.html", "/app-shell"],
+  "exclude": []
+}
