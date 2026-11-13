@@ -289,6 +289,70 @@
   .fi .cpy{border:0;background:transparent;color:var(--muted);font:600 11.5px var(--sans);padding:8px;border-radius:8px;cursor:pointer}
   .fi .cpy:hover{background:var(--hover);color:var(--green)}
 
+  /* ---------- upit: dugme, forma ---------- */
+  .ibtn{display:inline-flex;align-items:center;gap:9px;font:700 14px var(--sans);color:#fff;background:var(--green);border:0;border-radius:999px;
+    padding:13px 22px;cursor:pointer;box-shadow:0 10px 24px -10px rgba(13,53,41,.5);white-space:nowrap}
+  .ibtn:hover{background:var(--green-d)}
+  .ibtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .ibtn.sm{padding:10px 16px;font-size:13px;box-shadow:none}
+  body:not(.leads-on) [data-interest],body:not(.client) [data-interest]{display:none!important}
+  .cshelf .cta{margin-top:18px}
+  .lmodal{position:fixed;inset:0;z-index:30;background:rgba(9,42,32,.5);display:grid;place-items:center;padding:16px;overflow-y:auto}
+  .lmodal form{width:min(460px,100%);background:var(--card);border-radius:18px;overflow:hidden;box-shadow:0 30px 70px -20px rgba(0,0,0,.5);animation:fabin .25s ease}
+  .lmodal header{background:var(--green-d);color:#fff;padding:20px 22px;display:grid;gap:4px}
+  .lmodal header b{font-family:var(--serif);font-weight:400;font-size:24px}
+  .lmodal header span{font-size:13px;color:rgba(255,255,255,.75)}
+  .lmodal .lb{display:grid;gap:12px;padding:20px 22px 22px}
+  .lmodal label{display:grid;gap:5px;font-size:12.5px;font-weight:600;color:var(--green)}
+  .lmodal label small{font-weight:500;color:var(--muted)}
+  .lmodal input[type=text],.lmodal input[type=tel],.lmodal input[type=email],.lmodal textarea{width:100%;font:500 14px var(--sans);color:var(--ink);
+    padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#fff}
+  .lmodal textarea{min-height:70px;resize:vertical}
+  .lmodal input:focus,.lmodal textarea:focus{outline:2px solid var(--gold-b);border-color:var(--gold-a)}
+  .lmodal .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .lmodal .ok{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;font-weight:500;color:var(--muted)}
+  .lmodal .ok input{width:17px;height:17px;margin-top:1px;accent-color:var(--green);flex:none}
+  .lmodal .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+  .lmodal .acts{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+  .lmodal .err{font-size:13px;color:#951A1F;background:rgba(149,26,31,.07);border-radius:8px;padding:9px 12px}
+  .lmodal .done{padding:30px 22px;display:grid;gap:12px;justify-items:center;text-align:center}
+  .lmodal .done b{font-family:var(--serif);font-weight:400;font-size:24px;color:var(--green)}
+  .lmodal .done p{color:var(--muted);font-size:14px;max-width:34ch}
+  .lmodal .done .tick{width:54px;height:54px;border-radius:50%;background:var(--hover);display:grid;place-items:center;color:var(--green)}
+  .lmodal .done .tick svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+  @media (max-width:520px){ .lmodal .row2{grid-template-columns:1fr} }
+
+  /* ---------- upiti u panelu ---------- */
+  .nav .badge{background:#C9A25E;color:var(--green-dd);font-weight:700;border-radius:999px;padding:1px 7px;font-size:11px}
+  .lfil{display:flex;gap:6px;flex-wrap:wrap;padding:0 0 16px}
+  .lfil button{font:600 12.5px var(--sans);color:var(--green);background:transparent;border:1px solid var(--line);border-radius:999px;padding:7px 12px;cursor:pointer}
+  .lfil button[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:#fff}
+  .llist{display:grid;gap:12px}
+  .lcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:12px 22px}
+  .lcard.st-novo{border-left:4px solid #C9A25E}
+  .lcard .who{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .lcard .who b{font-size:16px;color:var(--green)}
+  .lcard .who time{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .lcard .ct{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;font-size:13.5px}
+  .lcard .ct a{color:var(--green);font-weight:600;text-decoration:none}
+  .lcard .ct a:hover{text-decoration:underline}
+  .lcard dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin-top:10px;font-size:13px}
+  .lcard dt{color:var(--muted)}
+  .lcard dd{margin:0;min-width:0;overflow-wrap:anywhere}
+  .lcard .side2{display:grid;gap:8px;align-content:start}
+  .lcard select,.lcard textarea{width:100%;font:500 13px var(--sans);padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+  .lcard textarea{min-height:58px;resize:vertical}
+  .lcard .sacts{display:flex;gap:6px;justify-content:flex-end}
+  .lcard .sacts button{font:600 12.5px var(--sans);border-radius:8px;padding:7px 12px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--green)}
+  .lcard .sacts button.pri{background:var(--green);color:#fff;border-color:var(--green)}
+  .lcard .sacts button.del{color:#951A1F}
+  .pill{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:3px 9px}
+  .pill.novo{background:#F6EBD3;color:#7A4E14} .pill.obrada{background:#E3EEF5;color:#09486B} .pill.zavrseno{background:var(--hover);color:var(--green)}
+  @media (max-width:900px){ .lcard{grid-template-columns:1fr} }
+  body:not(.client) .fabbtn{width:50px;height:50px;padding:0;justify-content:center} body:not(.client) .fabbtn span{display:none}
+  .main{padding-bottom:96px}
+  @media (max-width:640px){ .ptop .x{font-size:0;padding:10px 14px} .ptop .x::after{content:"←";font-size:16px} }
+
   /* ---------- responsive ---------- */
   @media (max-width:900px){
     .side{position:static;width:auto;padding:calc(14px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px))}
@@ -380,6 +444,12 @@
     </div>
     <div class="grid" id="grid"></div>
   </section>
+  <section id="view-leads" hidden>
+    <div class="rhead"><h2>Upiti klijenata</h2><span id="lCount"></span></div>
+    <div class="lfil" id="lfil" role="group" aria-label="Filter upita"></div>
+    <div class="llist" id="llist"></div>
+    <p class="empty" id="lEmpty" hidden></p>
+  </section>
   <section id="view-search" hidden>
     <div class="rhead"><h2>Rezultati pretrage</h2><span id="rCount"></span></div>
     <div class="grid" id="rgrid"></div>
@@ -394,6 +464,7 @@
       <p class="eyebrow">Stambeno poslovni centar Sarajka</p>
       <h1 id="cTitle"></h1>
       <p class="lead" id="cLead"></p>
+      <div class="cta"><button class="ibtn" type="button" data-interest><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>Zainteresovan sam</button></div>
     </div>
     <div class="bgrid" id="cgrid"></div>
   </div>
@@ -405,6 +476,7 @@
     <span class="pn"><i></i><span id="pName">Lamela A</span><small id="pLabel"></small></span>
     <span class="sp"></span>
     <a href="https://www.sarajka.ba" target="_blank" rel="noopener">www.sarajka.ba</a>
+    <button class="ibtn sm" type="button" data-interest>Zainteresovan sam</button>
     <button class="x" id="pClose">Zatvori prezentaciju</button>
   </div>
   <div class="stage" id="stage" aria-label="Brošura">
@@ -446,6 +518,11 @@
 <div class="fab" id="fab">
   <div class="fabmenu" id="fabmenu" role="dialog" aria-label="Kontakt" hidden>
     <header><img src="img/logo-light.svg" alt="" width="64" height="38"><div><b>Kontaktirajte nas</b><small>Stambeno poslovni centar Sarajka</small></div></header>
+    <div class="fi" data-interest-row>
+      <span class="ico"><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg></span>
+      <a href="#" data-interest><b>Zainteresovan sam</b><span>Ostavite kontakt, mi vas zovemo</span></a>
+      <span></span>
+    </div>
     <div class="fi">
       <span class="ico"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></span>
       <a href="tel:+38733762222"><b>Pozovite nas</b><span>033 762 222</span></a>
@@ -463,6 +540,31 @@
     </div>
   </div>
   <button class="fabbtn" id="fabbtn" aria-expanded="false" aria-controls="fabmenu" aria-label="Kontakt"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg><span>Kontakt</span></button>
+</div>
+
+<div class="lmodal" id="lmodal" hidden>
+  <form id="lform" role="dialog" aria-modal="true" aria-labelledby="lmTitle" novalidate>
+    <header><b id="lmTitle">Zainteresovani ste?</b><span>Ostavite kontakt i naš prodajni tim će vas pozvati.</span></header>
+    <div class="lb" id="lbody">
+      <div class="row2">
+        <label>Ime i prezime<input type="text" id="lName" name="name" autocomplete="name" maxlength="80" required></label>
+        <label>Telefon<input type="tel" id="lPhone" name="phone" autocomplete="tel" maxlength="30" required placeholder="npr. 061 234 567"></label>
+      </div>
+      <label>E-mail <small>(nije obavezno)</small><input type="email" id="lEmail" name="email" autocomplete="email" maxlength="120"></label>
+      <label>Šta vas zanima?<input type="text" id="lInterest" name="interest" maxlength="200" placeholder="npr. dvosoban stan, Lamela A, 7. sprat"></label>
+      <label>Poruka <small>(nije obavezno)</small><textarea id="lMsg" name="message" maxlength="1000"></textarea></label>
+      <label class="hp" aria-hidden="true">Web<input type="text" id="lWeb" name="web" tabindex="-1" autocomplete="off"></label>
+      <label class="ok"><input type="checkbox" id="lOk" required><span>Slažem se da me Sarajka kontaktira u vezi s ovim upitom.</span></label>
+      <p class="err" id="lErr" hidden></p>
+      <div class="acts"><button class="btn" type="button" id="lCancel">Odustani</button><button class="btn pri" type="submit" id="lSend">Pošalji upit</button></div>
+    </div>
+    <div class="done" id="ldone" hidden>
+      <span class="tick"><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg></span>
+      <b>Hvala vam!</b>
+      <p>Vaš upit je primljen. Naš prodajni tim će vas kontaktirati u najkraćem roku.</p>
+      <button class="btn pri" type="button" id="lClose">Zatvori</button>
+    </div>
+  </form>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -668,6 +770,126 @@ function buildHome(){
 }
 buildHome();
 buildPacks();
+
+/* ---------- upit s klijentske stranice ---------- */
+if (CFG.leads) document.body.classList.add('leads-on');
+if (!CFG.leads) document.querySelector('[data-interest-row]').remove();
+function leadContext(){
+  try {
+    if (zopen && zB) return `${zB.name} – ${[...new Set(zPages().map(i => zB.labels[i][0]))].join(' / ')}`;
+    if (presenting && cur) return `${cur.name} – ${[...new Set(shownPages().map(i => cur.labels[i][0]))].join(' / ')}`;
+    if (clientPack) return clientPack.title;
+  } catch(e) {}
+  return '';
+}
+function openLead(){
+  fabToggle(false);
+  $('lbody').hidden = false; $('ldone').hidden = true; $('lErr').hidden = true;
+  const ctx = leadContext();
+  if (ctx && !$('lInterest').dataset.touched) $('lInterest').value = ctx;
+  $('lmodal').hidden = false; $('lName').focus();
+}
+function closeLead(){ $('lmodal').hidden = true; }
+document.querySelectorAll('[data-interest]').forEach(el => el.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); openLead(); }));
+$('lInterest').addEventListener('input', () => $('lInterest').dataset.touched = 1);
+$('lCancel').onclick = $('lClose').onclick = closeLead;
+$('lmodal').addEventListener('click', e => { if (e.target === $('lmodal')) closeLead(); });
+$('lform').addEventListener('submit', async e => {
+  e.preventDefault();
+  const err = m => { $('lErr').textContent = m; $('lErr').hidden = false; };
+  const name = $('lName').value.trim(), phone = $('lPhone').value.trim(), email = $('lEmail').value.trim();
+  if (name.length < 2) return err('Upišite ime i prezime.');
+  if ((phone.match(/\d/g) || []).length < 6) return err('Upišite broj telefona na koji vas možemo pozvati.');
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return err('E-mail adresa nije ispravna.');
+  if (!$('lOk').checked) return err('Potvrdite da vas smijemo kontaktirati.');
+  $('lErr').hidden = true; $('lSend').disabled = true; $('lSend').textContent = 'Šaljem…';
+  try {
+    const r = await fetch(CFG.leadUrl || '/upit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+      name, phone, email, interest: $('lInterest').value.trim(), message: $('lMsg').value.trim(), consent: true, web: $('lWeb').value,
+      ctx: { pack: clientPack ? clientPack.id : null, brochure: (zopen && zB ? zB.id : cur ? cur.id : null), page: leadContext(), url: location.href } }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok || !d.ok) throw new Error(d.error || 'Upit trenutno nije moguće poslati. Pozovite nas na 033 762 222.');
+    $('lbody').hidden = true; $('ldone').hidden = false;
+    ['lMsg'].forEach(id => $(id).value = '');
+  } catch(ex){ err(ex.message); }
+  finally { $('lSend').disabled = false; $('lSend').textContent = 'Pošalji upit'; }
+});
+
+/* ---------- upiti u panelu ---------- */
+const LST = {novo: 'Novo', obrada: 'U obradi', zavrseno: 'Završeno'};
+let LEADS = [], lFilter = 'novo';
+if (CFG.user && CFG.leads){
+  const lb = document.createElement('button');
+  lb.dataset.id = 'leads'; lb.className = 'all';
+  lb.innerHTML = `<i><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 2.5h10v7H1z"/><path d="m1 3 5 3.5L11 3"/></svg></i><b>Upiti klijenata</b><small class="badge" id="lBadge" hidden>0</small><em>Zainteresovani klijenti</em>`;
+  lb.onclick = () => { clearSearch(); showLeads(); };
+  $('nav').querySelector('[data-id=home]').after(lb);
+  loadLeads(false);
+  setInterval(() => loadLeads(view === 'leads'), 120000);
+}
+async function loadLeads(draw){
+  try {
+    const r = await fetch(CFG.leadsApi || '/api/upiti', { headers: { 'Accept': 'application/json' } });
+    if (!r.ok) throw new Error();
+    LEADS = (await r.json()).leads || [];
+  } catch(e){ if (draw) toast('Upite trenutno nije moguće učitati.'); return; }
+  const n = LEADS.filter(l => l.status === 'novo').length;
+  const bd = $('lBadge'); if (bd){ bd.textContent = n; bd.hidden = !n; }
+  if (draw) drawLeads();
+}
+function showLeads(keepHash){
+  setView('leads'); sel = null;
+  document.documentElement.style.setProperty('--acc', '#134A3A');
+  $('nav').querySelectorAll('button').forEach(x => x.setAttribute('aria-current', x.dataset.id === 'leads'));
+  if (!keepHash) try { history.replaceState(null, '', '#upiti'); } catch(e) {}
+  document.title = 'Upiti klijenata – Sarajka prodajni panel';
+  scrollTo(0, 0); drawLeads(); loadLeads(true);
+}
+function drawLeads(){
+  const counts = {sve: LEADS.length}; LEADS.forEach(l => counts[l.status] = (counts[l.status] || 0) + 1);
+  $('lfil').innerHTML = '';
+  [['novo','Novi'],['obrada','U obradi'],['zavrseno','Završeni'],['sve','Svi']].forEach(([k, t]) => {
+    const b = document.createElement('button'); b.textContent = `${t} ${counts[k] || 0}`; b.setAttribute('aria-pressed', k === lFilter);
+    b.onclick = () => { lFilter = k; drawLeads(); }; $('lfil').appendChild(b);
+  });
+  const list = LEADS.filter(l => lFilter === 'sve' || l.status === lFilter);
+  $('lCount').textContent = `${LEADS.length} ${LEADS.length === 1 ? 'upit' : 'upita'} ukupno`;
+  const box = $('llist'); box.innerHTML = '';
+  $('lEmpty').hidden = !!list.length;
+  $('lEmpty').textContent = LEADS.length ? 'Nema upita u ovom filteru.' : 'Još nema upita. Kad klijent na stranici klikne „Zainteresovan sam“ i pošalje formu, upit se pojavljuje ovdje.';
+  const fmt = t => new Date(t).toLocaleString('bs-BA', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
+  list.forEach(l => {
+    const el = document.createElement('article'); el.className = 'lcard st-' + l.status;
+    const tel = l.phone.replace(/[^\d+]/g, '');
+    el.innerHTML = `<div>
+        <div class="who"><b>${esc(l.name)}</b><span class="pill ${l.status}">${LST[l.status] || l.status}</span><time>${fmt(l.t)}</time></div>
+        <div class="ct"><a href="tel:${esc(tel)}">${esc(l.phone)}</a>${l.email ? `<a href="mailto:${esc(l.email)}">${esc(l.email)}</a>` : ''}<button class="btn" style="padding:4px 10px;font-size:12px" data-cp="${esc(l.phone)}">Kopiraj broj</button></div>
+        <dl>${l.interest ? `<dt>Zanima ga</dt><dd>${esc(l.interest)}</dd>` : ''}${l.message ? `<dt>Poruka</dt><dd>${esc(l.message)}</dd>` : ''}
+          ${l.source && l.source !== l.interest ? `<dt>Izvor</dt><dd>${esc(l.source)}</dd>` : ''}${l.by ? `<dt>Obradio</dt><dd>${esc(l.by)}</dd>` : ''}</dl>
+      </div>
+      <div class="side2">
+        <select aria-label="Status upita">${Object.entries(LST).map(([k, t]) => `<option value="${k}"${k === l.status ? ' selected' : ''}>${t}</option>`).join('')}</select>
+        <textarea placeholder="Bilješka (npr. pozvan, termin za razgledanje…)" aria-label="Bilješka">${esc(l.note || '')}</textarea>
+        <div class="sacts">${CFG.user.admin ? '<button class="del" type="button">Obriši</button>' : ''}<button class="pri" type="button">Sačuvaj</button></div>
+      </div>`;
+    el.querySelector('[data-cp]').onclick = e => copy(e.target.dataset.cp, 'broj telefona');
+    el.querySelector('.pri').onclick = () => saveLead(l.id, { status: el.querySelector('select').value, note: el.querySelector('textarea').value });
+    const d = el.querySelector('.del');
+    if (d) d.onclick = () => { if (!d.dataset.sure){ d.dataset.sure = 1; d.textContent = 'Potvrdi brisanje'; return; } saveLead(l.id, { del: true }); };
+    box.appendChild(el);
+  });
+}
+async function saveLead(id, body){
+  try {
+    const r = await fetch(CFG.leadsApi || '/api/upiti', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, ...body }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok || !d.ok) throw new Error(d.error || 'Spremanje nije uspjelo.');
+    if (body.del) LEADS = LEADS.filter(l => l.id !== id); else Object.assign(LEADS.find(l => l.id === id) || {}, d.lead);
+    toast(body.del ? 'Upit je obrisan.' : 'Upit je sačuvan.');
+    const n = LEADS.filter(l => l.status === 'novo').length; const bd = $('lBadge'); if (bd){ bd.textContent = n; bd.hidden = !n; }
+    drawLeads();
+  } catch(e){ toast(e.message); }
+}
 if (CFG.user){
   const u = document.createElement('div'); u.className = 'user';
   const L = CFG.links || {admin: 'admin.php', logout: 'odjava.php'};
@@ -676,7 +898,7 @@ if (CFG.user){
 }
 function setView(v){
   view = v;
-  $('view-home').hidden = v !== 'home'; $('view-bro').hidden = v !== 'bro';
+  $('view-home').hidden = v !== 'home'; $('view-bro').hidden = v !== 'bro'; $('view-leads').hidden = v !== 'leads';
 }
 function showHome(keepHash){
   setView('home'); sel = null;
@@ -1030,6 +1252,7 @@ if (window.ResizeObserver) new ResizeObserver(zResize).observe(zview);
 
 /* ---------- keyboard ---------- */
 addEventListener('keydown', e => {
+  if (!$('lmodal').hidden){ if (e.key === 'Escape') closeLead(); return; }
   if (!$('fabmenu').hidden && e.key === 'Escape'){ fabToggle(false); return; }
   if (!$('copybox').hidden){ if (e.key === 'Escape' || e.key === 'Enter') $('copybox').hidden = true; return; }
   if (zopen){
@@ -1092,6 +1315,7 @@ function route(){
   }
   if (CLIENT_ONLY && CFG.loginUrl){ location.replace(CFG.loginUrl); return; }
   if (CLIENT_ONLY) return clientMessage('Sarajka brošure', 'Za pregled ponude otvorite link ili skenirajte QR kod koji ste dobili od našeg prodajnog tima.');
+  if (h === 'upiti' && CFG.user && CFG.leads) return showLeads(true);
   if (BROS.some(b => b.id === h)) selectBro(h, true); else showHome(true);
 }
 addEventListener('resize', () => layout(false));

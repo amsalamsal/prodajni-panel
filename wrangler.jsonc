@@ -10,7 +10,7 @@
     "binding": "ASSETS",
     // Ove putanje prvo obrađuje Worker (prijava, panel, administracija, stranica za klijente);
     // slike i ostale statične datoteke se služe direktno.
-    "run_worker_first": ["/", "/panel", "/panel/", "/prijava", "/prijava/", "/odjava", "/odjava/", "/admin", "/admin/", "/app-shell*"]
+    "run_worker_first": ["/", "/panel", "/panel/", "/prijava", "/prijava/", "/odjava", "/odjava/", "/admin", "/admin/", "/upit", "/api/*", "/app-shell*"]
   },
   // KV prostor "prodajni-panel-sarajka" za linkove za klijente i korisnike.
   "kv_namespaces": [

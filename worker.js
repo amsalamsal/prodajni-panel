@@ -6,8 +6,10 @@ import * as panel from './functions/panel.js';
 import * as prijava from './functions/prijava.js';
 import * as odjava from './functions/odjava.js';
 import * as admin from './functions/admin.js';
+import * as upit from './functions/upit.js';
+import * as upiti from './functions/api/upiti.js';
 
-const ROUTES = { '/': index, '/panel': panel, '/prijava': prijava, '/odjava': odjava, '/admin': admin };
+const ROUTES = { '/': index, '/panel': panel, '/prijava': prijava, '/odjava': odjava, '/admin': admin, '/upit': upit, '/api/upiti': upiti };
 
 export default {
   async fetch(request, env, ctx) {

@@ -9,6 +9,7 @@ Radi na **Cloudflare Pages** (statične stranice + Pages Functions) s podacima u
 | `/?p=stanovi`, `/?p=garaze`, `/?p=poslovni` … | svi (klijenti) | brošure iz jednog paketa – trajni link / QR kod |
 | `/?k=lamela-a-12` | svi (klijenti) | jedna brošura ili stranica (link iz panela) |
 | `/admin` | administratori | linkovi za klijente, QR kodovi, korisnici |
+| `/#upiti` | prijavljeni agenti | upiti klijenata |
 | `/prijava`, `/odjava` | – | prijava / odjava |
 
 ## Postavljanje na Cloudflare – Workers (preporučeno)
@@ -52,6 +53,24 @@ Repozitorij je spreman za **Workers** projekat povezan s GitHubom (deploy komand
 > Cloudflare Pages se ne može postaviti na putanju `www.sarajka.ba/brosure` ako glavna stranica radi negdje drugo,
 > zato se koristi poddomena (npr. `brosure.sarajka.ba` ili `ponuda.sarajka.ba`).
 
+## Upiti klijenata („Zainteresovan sam“)
+
+Na stranicama za klijente postoji dugme **Zainteresovan sam** (na stranici paketa, u gornjoj traci prezentacije i u meniju Kontakt).
+Klijent upiše ime, telefon, (e-mail), šta ga zanima i poruku; polje „Šta vas zanima?“ se samo popuni brošurom i stranicom koju gleda.
+
+- Upiti se spremaju u KV i vide u panelu pod **Upiti klijenata** (broj novih je istaknut). Agent mijenja status
+  (Novo / U obradi / Završeno) i piše bilješku; brisati može samo administrator.
+- Zaštita od spama: skriveno polje za robote i najviše 5 upita na sat s iste IP adrese.
+- Novi upit se u listi može pojaviti s kašnjenjem do jedne minute.
+
+**Obavijest e-mailom (opcionalno)** – preko [Resend](https://resend.com) (besplatno do 3.000 e-mailova mjesečno):
+1. Napravite račun na resend.com → *API Keys* → *Create API Key*.
+2. U Cloudflareu (Settings → Variables and Secrets) dodajte:
+   - `RESEND_API_KEY` *(Secret)* = ključ iz Resenda
+   - `UPIT_EMAIL` = adresa(e) za obavijesti, npr. `info@sarajka.ba` (više adresa odvojite zarezom)
+   - `UPIT_FROM` *(nakon što u Resendu potvrdite domenu sarajka.ba)* = npr. `Sarajka panel <panel@sarajka.ba>`
+3. Bez potvrđene domene Resend šalje samo na e-mail adresu s kojom ste otvorili Resend račun.
+
 ## Trajni linkovi i QR kodovi
 
 - Adresa linka je `PUBLIC_URL?p=naziv` i nikad se ne mijenja.
@@ -79,7 +98,7 @@ public/              statične datoteke (Cloudflare Pages output)
   img/ zoom/ sprite/ stranice brošura (standardne, za zum, sličice)
   assets/            administracija (CSS/JS), QR biblioteka
   _routes.json       samo ove putanje pokreću Functions; slike se služe direktno
-functions/           obrada zahtjeva: index (klijenti), panel, prijava, odjava, admin, _middleware
+functions/           obrada zahtjeva: index (klijenti), panel, prijava, odjava, admin, upit, api/upiti, _middleware
 worker.js            ulaz za Cloudflare Workers (koristi functions/)
 wrangler.jsonc       postavke za Workers (assets, KV)
 lib/sarajka.js       zajednička logika: KV, šifre, sesije, prikaz
