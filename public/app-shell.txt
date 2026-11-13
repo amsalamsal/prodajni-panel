@@ -245,6 +245,8 @@
   .zcan.anim{transition:transform .28s cubic-bezier(.2,.7,.2,1)}
   .zcan img{display:block;width:1600px;min-width:1600px;max-width:none;height:1131px;flex:none;object-fit:cover;background:#fff;user-select:none;-webkit-user-drag:none;pointer-events:none}
   .zcan img + img{box-shadow:inset 14px 0 18px -14px rgba(0,0,0,.25)}
+  .zcan img.zdet{position:absolute;min-width:0;max-width:none;flex:none;background:transparent;box-shadow:none;object-fit:fill;opacity:0;transition:opacity .25s}
+  .zcan img.zdet.ok{opacity:1}
   .zbar{display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap;
     padding:10px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));background:var(--green);color:#fff}
   .zbar button{font:600 14px/1 var(--sans);color:#fff;background:transparent;border:0;border-radius:999px;padding:10px 13px;cursor:pointer;min-width:40px}
@@ -1113,6 +1115,14 @@ const zoom = $('zoom'), zview = $('zview'), zcan = $('zcan'), ztip = $('ztip');
 const ZW = 1600, ZH = ZW / R;
 let zs = 1, zx = 0, zy = 0, zfit = 1, zcount = 1, zopen = false, zMode = 'book', zIdx = 0, zB = null;
 const zsrc = (b, i) => b.id === 'sarajka' ? src(b, i) : `zoom/${b.id}/${nn(i)}.jpg`;
+/* Tlocrti sa sitnim oznakama: izrez tlocrta u vrlo visokoj rezoluciji (x, y, širina, visina kao udio stranice).
+   Učitava se tek kad se stranica uveća, pa kvadrature ostaju oštre. */
+const ZDETAIL = {"lamela-bc":{"12":[0.025,0.2602,0.9396,0.3048],"13":[0.0464,0.2597,0.9182,0.3281],"14":[0.025,0.2612,0.9396,0.3286],"15":[0.0418,0.2627,0.9229,0.3165],"16":[0.025,0.2637,0.9396,0.321],"17":[0.0354,0.2647,0.9293,0.323],"18":[0.025,0.2612,0.9329,0.323],"19":[0.05,0.2602,0.9146,0.3261],"20":[0.025,0.2637,0.9325,0.3225],"21":[0.025,0.2536,0.9396,0.3331],"22":[0.025,0.2653,0.9389,0.317],"23":[0.0475,0.2597,0.9171,0.3215],"24":[0.025,0.2668,0.93,0.3175]}};
+let zDets = [];
+function zDetail(){
+  if (zs < zfit * 1.6) return;
+  zDets.forEach(d => { if (!d.src) d.src = d.dataset.src; });
+}
 
 function zPages(){ return zMode === 'book' ? shownPages() : [zIdx]; }
 function zApply(anim){
@@ -1121,6 +1131,7 @@ function zApply(anim){
   $('zpct').textContent = Math.round(zs / zfit * 100) + '%';
   $('zout').disabled = zs <= zfit * 1.001;
   $('zin').disabled = zs >= zfit * 8 * 0.999;
+  zDetail();
 }
 function zClamp(){
   // stranica ostaje gdje je korisnik ostavi; rub može doći najviše do sredine ekrana
@@ -1143,11 +1154,19 @@ function zAt(px, py, f, anim){
 function zLoad(){
   const b = zB, ps = zPages(); zcount = ps.length;
   zcan.innerHTML = ''; zcan.style.width = (ZW * ps.length) + 'px'; zcan.style.height = ZH + 'px';
-  ps.forEach(i => {
+  zDets = [];
+  ps.forEach((i, k) => {
     const im = new Image(); im.alt = 'Stranica ' + (i+1); im.draggable = false;
     im.src = src(b, i);
     const hi = new Image(); hi.onload = () => { im.src = hi.src; }; hi.src = zsrc(b, i);
     zcan.appendChild(im);
+    const r = (ZDETAIL[b.id] || {})[i + 1];
+    if (r){
+      const d = new Image(); d.className = 'zdet'; d.alt = ''; d.draggable = false; d.dataset.src = `zoom/${b.id}/${nn(i)}-d.jpg`;
+      Object.assign(d.style, { left: (k + r[0]) * ZW + 'px', top: r[1] * ZH + 'px', width: r[2] * ZW + 'px', height: r[3] * ZH + 'px' });
+      d.onload = () => d.classList.add('ok');
+      zcan.appendChild(d); zDets.push(d);
+    }
   });
   $('zname').textContent = `${b.name} · ${[...new Set(ps.map(i => b.labels[i][0]))].join(' / ')}`;
   $('zcount').textContent = ps.length > 1 ? `${ps[0]+1}–${ps[1]+1} / ${b.pages}` : `${ps[0]+1} / ${b.pages}`;
