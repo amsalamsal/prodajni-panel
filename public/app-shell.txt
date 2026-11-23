@@ -241,8 +241,9 @@
   @keyframes zin{from{opacity:0}}
   .zview{position:relative;overflow:hidden;touch-action:none;cursor:grab;background:radial-gradient(ellipse at 50% 45%,#F6F4F0 0%,#E4E0D9 75%)}
   .zview.drag{cursor:grabbing}
-  .zcan{position:absolute;left:0;top:0;transform-origin:0 0;display:flex;will-change:transform;box-shadow:0 30px 60px -30px rgba(40,30,20,.5)}
+  .zcan{position:absolute;left:0;top:0;transform-origin:0 0;display:flex;box-shadow:0 30px 60px -30px rgba(40,30,20,.5)}
   .zcan.anim{transition:transform .28s cubic-bezier(.2,.7,.2,1)}
+  .zcan.moving{will-change:transform}
   .zcan img{display:block;width:1600px;min-width:1600px;max-width:none;height:1131px;flex:none;object-fit:cover;background:#fff;user-select:none;-webkit-user-drag:none;pointer-events:none}
   .zcan img + img{box-shadow:inset 14px 0 18px -14px rgba(0,0,0,.25)}
   .zcan img.zdet{position:absolute;min-width:0;max-width:none;flex:none;background:transparent;box-shadow:none;object-fit:fill;opacity:0;transition:opacity .25s}
@@ -1117,7 +1118,7 @@ let zs = 1, zx = 0, zy = 0, zfit = 1, zcount = 1, zopen = false, zMode = 'book',
 const zsrc = (b, i) => b.id === 'sarajka' ? src(b, i) : `zoom/${b.id}/${nn(i)}.jpg`;
 /* Tlocrti sa sitnim oznakama: izrez tlocrta u vrlo visokoj rezoluciji (x, y, širina, visina kao udio stranice).
    Učitava se tek kad se stranica uveća, pa kvadrature ostaju oštre. */
-const ZDETAIL = {"lamela-bc":{"12":[0.025,0.2602,0.9396,0.3048],"13":[0.0464,0.2597,0.9182,0.3281],"14":[0.025,0.2612,0.9396,0.3286],"15":[0.0418,0.2627,0.9229,0.3165],"16":[0.025,0.2637,0.9396,0.321],"17":[0.0354,0.2647,0.9293,0.323],"18":[0.025,0.2612,0.9329,0.323],"19":[0.05,0.2602,0.9146,0.3261],"20":[0.025,0.2637,0.9325,0.3225],"21":[0.025,0.2536,0.9396,0.3331],"22":[0.025,0.2653,0.9389,0.317],"23":[0.0475,0.2597,0.9171,0.3215],"24":[0.025,0.2668,0.93,0.3175]}};
+const ZDETAIL = {"lamela-bc":{"12":[0.025,0.2602,0.9396,0.3048],"13":[0.0464,0.2597,0.9182,0.3281],"14":[0.025,0.2612,0.9396,0.3286],"15":[0.0418,0.2627,0.9229,0.3165],"16":[0.025,0.2637,0.9396,0.321],"17":[0.0354,0.2647,0.9293,0.323],"18":[0.025,0.2612,0.9329,0.323],"19":[0.05,0.2602,0.9146,0.3261],"20":[0.025,0.2637,0.9325,0.3225],"21":[0.025,0.2536,0.9396,0.3331],"22":[0.025,0.2653,0.9389,0.317],"23":[0.0475,0.2597,0.9171,0.3215],"24":[0.025,0.2668,0.93,0.3175]},"lamela-a":{"12":[0.0,0.09,1.0,0.7],"13":[0.0,0.09,1.0,0.7],"14":[0.0,0.09,1.0,0.7],"15":[0.0,0.09,1.0,0.7],"16":[0.0,0.09,1.0,0.7],"17":[0.0,0.09,1.0,0.7],"18":[0.0,0.09,1.0,0.7],"19":[0.0,0.09,1.0,0.7],"20":[0.0,0.09,1.0,0.7],"21":[0.0,0.09,1.0,0.7],"22":[0.0,0.09,1.0,0.7],"23":[0.0,0.09,1.0,0.7],"24":[0.0,0.09,1.0,0.7],"25":[0.0,0.09,1.0,0.7],"26":[0.0,0.09,1.0,0.7],"27":[0.0,0.09,1.0,0.7],"28":[0.0,0.09,1.0,0.7],"29":[0.0,0.09,1.0,0.7],"30":[0.0,0.09,1.0,0.7],"31":[0.0,0.09,1.0,0.7]},"lamela-d":{"12":[0.0,0.09,1.0,0.66],"13":[0.0,0.09,1.0,0.66],"14":[0.0,0.09,1.0,0.66],"15":[0.0,0.09,1.0,0.66],"16":[0.0,0.09,1.0,0.66],"17":[0.0,0.09,1.0,0.66],"18":[0.0,0.09,1.0,0.66],"19":[0.0,0.09,1.0,0.66],"20":[0.0,0.09,1.0,0.66],"21":[0.0,0.09,1.0,0.66],"22":[0.0,0.09,1.0,0.66],"23":[0.0,0.09,1.0,0.66],"24":[0.0,0.09,1.0,0.66],"25":[0.0,0.09,1.0,0.66],"26":[0.0,0.09,1.0,0.66],"27":[0.0,0.09,1.0,0.66],"28":[0.0,0.09,1.0,0.66],"29":[0.0,0.09,1.0,0.66],"30":[0.0,0.09,1.0,0.66],"31":[0.0,0.09,1.0,0.66],"32":[0.0,0.09,1.0,0.66],"33":[0.0,0.09,1.0,0.66]},"lamela-e":{"12":[0.0,0.07,1.0,0.9],"13":[0.0,0.09,1.0,0.66],"14":[0.0,0.09,1.0,0.66],"15":[0.0,0.09,1.0,0.66],"16":[0.0,0.09,1.0,0.66],"17":[0.0,0.09,1.0,0.66]},"poslovni":{"6":[0.0,0.07,1.0,0.9],"7":[0.0,0.07,1.0,0.9],"8":[0.0,0.07,1.0,0.9],"9":[0.0,0.07,1.0,0.9],"10":[0.0,0.07,1.0,0.9],"11":[0.0,0.07,1.0,0.9],"12":[0.0,0.07,1.0,0.9],"13":[0.0,0.07,1.0,0.9],"14":[0.0,0.07,1.0,0.9],"15":[0.0,0.07,1.0,0.9]},"podzemne":{"6":[0.0,0.07,1.0,0.9],"7":[0.0,0.07,1.0,0.9],"8":[0.0,0.07,1.0,0.9],"9":[0.0,0.07,1.0,0.9],"10":[0.0,0.07,1.0,0.9],"11":[0.0,0.07,1.0,0.9],"12":[0.0,0.07,1.0,0.9],"13":[0.0,0.07,1.0,0.9]},"vanjsko":{"1":[0.0,0.0212,1.0,0.9571]}};
 let zDets = [];
 function zDetail(){
   if (zs < zfit * 1.6) return;
@@ -1125,7 +1126,16 @@ function zDetail(){
 }
 
 function zPages(){ return zMode === 'book' ? shownPages() : [zIdx]; }
+/* Tokom pomjeranja/zumiranja sloj je ubrzan (glatko), a nakon što stane preglednik ga
+   ponovo iscrta u punoj rezoluciji – inače bi tlocrti ostali razvučeni i mutni. */
+let zSettle = 0;
+function zMoving(){
+  zcan.classList.add('moving');
+  clearTimeout(zSettle);
+  zSettle = setTimeout(() => zcan.classList.remove('moving'), 220);
+}
 function zApply(anim){
+  zMoving();
   zcan.classList.toggle('anim', !!anim);
   zcan.style.transform = `translate(${zx}px,${zy}px) scale(${zs})`;
   $('zpct').textContent = Math.round(zs / zfit * 100) + '%';
